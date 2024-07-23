@@ -3,4 +3,4 @@ kind: Kustomization
 namespace: cluster-config
 resources:
   - nvidia-smi.yaml
-  - cuda-add.yaml
+  - yolov5.yaml

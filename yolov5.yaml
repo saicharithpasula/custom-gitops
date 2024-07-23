@@ -1,0 +1,16 @@
+apiVersion: v1 
+kind: Pod 
+metadata: 
+  name: yolo-test-1
+spec: 
+  restartPolicy: OnFailure 
+  runtimeClassName: nvidia 
+  containers: 
+    - name: yolo-test 
+      image: "metropolicstestacr.azurecr.io/yolo_test" 
+      resources: 
+         limits: 
+           nvidia.com/gpu: 1 
+  imagePullSecrets:
+      - name: azure
+
