@@ -2,7 +2,7 @@ apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
   name: kubernetesdeploymentdemo
-  namespace: gitopsdemo
+  namespace: kubernetesdeploymentdemo
   annotations:
     clusterconfig.azure.com/use-managed-source: "true"
 spec:
@@ -10,4 +10,6 @@ spec:
   releaseName: kubernetesdeploymentdemo
   chart: 
     spec:
-      chart: ./foundational-system/mdx-foundation-sys-svcs
+      chart: ./ArcHelmGitOps/charts/kubernetesdeploymentdemo
+  values:
+    replicaCount: 2
