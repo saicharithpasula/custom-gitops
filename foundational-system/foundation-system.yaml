@@ -10,6 +10,6 @@ spec:
   releaseName: kubernetesdeploymentdemo
   chart: 
     spec:
-      chart: ./ArcHelmGitOps/charts/kubernetesdeploymentdemo
+      chart: ./foundational-system/mdx-foundation-sys-svcs
   values:
     replicaCount: 2
