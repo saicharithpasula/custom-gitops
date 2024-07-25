@@ -1,0 +1,8 @@
+Component:
+  app-version: v1.0
+  description: MDX foundational systems services
+  helmUrlLocationPath: https://helm.ngc.nvidia.com/myorg/myteam/charts
+  name: mdx-foundation-sys-svcs
+  version: v1.0
+
+

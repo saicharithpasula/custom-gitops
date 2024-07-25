@@ -1,0 +1,6 @@
+#contains container spec file that runs tests with helm tests
+#containers:
+#   - name: test-container1
+#     image: test-container:tag
+#     command: ['test']
+#     args: ['arg1', 'arg2']

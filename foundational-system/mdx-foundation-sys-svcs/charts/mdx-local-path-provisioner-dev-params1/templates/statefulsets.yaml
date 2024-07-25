@@ -1,0 +1,134 @@
+{{- $topValues := .Values }}
+{{- if $topValues.applicationSpecs }}
+{{- $applicationSpecs := $topValues.applicationSpecs }}
+{{- $wlSpecs := $topValues.workloadSpecs }}
+{{- range $appname, $appData := $applicationSpecs }}
+{{if eq $appData.apptype "statefull" }}
+---
+{{- $wlReplica := include "setReplicas" (dict "containers" $appData.containers  "wlSpecs" $wlSpecs) }}
+{{- $containers := $appData.containers }}
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ $.Chart.Name }}-{{ $appname }}
+  labels:
+    app: {{ $.Chart.Name }}-{{ $appname }}
+{{ include "hb.labels.standard" . | indent 4 }}
+{{- include "std-helm.labels" $ | nindent 4 }}
+spec:
+  serviceName: {{ $.Chart.Name }}-{{ $appname }}
+  {{- if $wlReplica }}
+  {{- $wlReplica | trim | nindent 2 }}
+  {{- else if $appData.replicas }}
+  replicas: {{ $appData.replicas }}
+  {{- else if $topValues.replicas }}
+  replicas: {{ $topValues.replicas }}
+  {{- end }}
+  selector:
+    matchLabels:
+      app: {{ $.Chart.Name }}-{{ $appname }}
+      {{- include "std-helm.selectorLabels" $ | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        app: {{ $.Chart.Name }}-{{ $appname }}
+{{ include "hb.labels.standard" . | indent 8 }}
+{{- include "std-helm.selectorLabels" $ | nindent 8 }}
+    spec:
+      {{- with $topValues.imagePullSecrets }}
+      imagePullSecrets:
+      {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- if $appData.initContainers }}
+      initContainers:
+      {{- range $appData.initContainers }}
+      - {{- toYaml . | nindent 8 }} 
+        volumeMounts:
+        {{- if $topValues.defaultVolumeMounts }}
+        {{- range $mount := $topValues.defaultVolumeMounts }}
+          - name: {{ $mount.name }}
+            mountPath: {{ $mount.mountPath }}
+        {{- end }}
+        {{- end }}
+      {{- if $appData.volumeMounts }}
+        {{- toYaml $appData.volumeMounts |  nindent 10 }}
+      {{- end }} # range
+      {{- end }} #if
+      {{- end }}
+      containers:
+      {{- range $containerName, $container := $containers }}
+      - name: {{ $containerName }}
+        image: {{ $container.image.repository}}:{{ $container.image.tag }}{{if $container.image.pullPolicy }}
+        imagePullPolicy: {{ $container.image.pullPolicy }}{{else if (($topValues.image).pullPolicy) }}
+        imagePullPolicy: {{ $topValues.image.pullPolicy }}
+        {{- end }}
+        {{- if $container.command }}
+        command:
+          {{- toYaml $container.command |  nindent 10 }}
+        {{- end }}
+        {{- if $container.args }}
+        args:
+          {{- toYaml $container.args |  nindent 10 }}
+        {{- end }}
+        {{- if $container.env }}
+        env:
+          {{- toYaml $container.env |  nindent 10 }}
+        {{- end }}
+        {{- if $container.readinessProbe  }}
+        readinessProbe:
+          {{- toYaml $container.readinessProbe | nindent 10 }}
+        {{- end }}
+        {{- if $container.livenessProbe  }}
+        livenessProbe:
+          {{- toYaml $container.livenessProbe | nindent 10 }}
+        {{- end }}
+        {{- if $container.ports }}
+        ports:
+        {{- toYaml $container.ports | nindent 10 }}
+        {{- end }}
+        {{- $workload_resources := "" }}
+        {{- if and ($wlSpecs) ($container.workload) }}
+        {{- $workload_resources = index $wlSpecs $container.workload  "wl_resources"  }}
+        {{- end }}
+        {{- if $workload_resources }}
+        #wld resources
+        resources:
+        {{- toYaml $workload_resources| nindent 10 }}
+        {{- else if $container.resources }}
+        #cont resources
+        resources:
+        {{- toYaml $container.resources| nindent 10 }}
+        {{- end }}
+        volumeMounts:
+        {{- if $topValues.defaultVolumeMounts }}
+          #Default volumeMounts
+        {{- range $mount := $topValues.defaultVolumeMounts }}
+          - name: {{ $mount.name }}
+            mountPath: {{ $mount.mountPath }}
+        {{- end }}
+        {{- end }}
+        {{- if $container.volumeMounts }}
+          #Container volumeMounts
+          {{- toYaml $container.volumeMounts |  nindent 10 }}
+        {{- end }}
+      {{- end }}
+      volumes:
+        #App Volumes
+      {{- if $appData.volumes }}
+        {{- toYaml $appData.volumes |  nindent 8 }}
+      {{- end }}
+      {{- if $topValues.defaultVolumes }}
+        #Default Volumes
+      {{- range $vol := $topValues.defaultVolumes }}
+        - {{ toYaml $vol | nindent 10 }}
+      {{- end }}
+      {{- end }}
+  {{- if $appData.volumeClaimTemplates }}
+  volumeClaimTemplates:
+  {{- range $vct := $appData.volumeClaimTemplates}}
+  - {{- toYaml $vct |  nindent 5 }} 
+  {{- end }}
+  {{- end }}
+{{- end }}
+{{- end }}
+{{- end }}

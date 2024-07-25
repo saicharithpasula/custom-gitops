@@ -1,0 +1,25 @@
+kube-prometheus-stack:
+  prometheus:
+    prometheusSpec:
+      additionalScrapeConfigs:
+      - job_name: gpu-metrics
+        kubernetes_sd_configs:
+        - namespaces:
+            names:
+            - nvidia-gpu-operator
+          role: endpoints
+        metrics_path: /metrics
+        scheme: http
+        scrape_interval: 15s
+      - job_name: app-metrics
+        kubernetes_sd_configs:
+        - {role: pod}
+        relabel_configs:
+        - action: keep
+          regex: true
+          source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_scrape]
+        - action: labelmap
+          regex: __meta_kubernetes_pod_label_(.+)
+        metrics_path: /metrics
+        scheme: http
+        scrape_interval: 15s

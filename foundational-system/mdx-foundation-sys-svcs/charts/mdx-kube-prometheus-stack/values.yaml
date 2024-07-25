@@ -1,0 +1,105 @@
+Component:
+  app-version: v1.0
+  description: foundation service helm chart for prometheus monitoring
+  helmUrlLocationPath: https://helm.ngc.nvidia.com/myorg/myteam/charts
+  name: mdx-kube-prometheus-stack
+  version: 1.0.3
+defaultVolumeMounts:
+- mountPath: /opt/configs
+  name: configs-volume
+- mountPath: /opt/scripts
+  name: scripts-cm-volume
+defaultVolumes:
+- configMap:
+    name: mdx-kube-prometheus-stack-configs-cm
+  name: configs-volume
+- configMap:
+    name: mdx-kube-prometheus-stack-scripts-cm
+  name: scripts-cm-volume
+kube-prometheus-stack:
+  alertmanager:
+    alertmanagerSpec:
+      podMetadata: {}
+    ingress:
+      enabled: false
+    servicePerReplica:
+      enabled: false
+  grafana:
+    adminPassword: prom-operator
+    enabled: true
+    service:
+      nodePort: 32300
+      portName: http-web
+      type: NodePort
+  kube-state-metrics:
+    namespaceOverride: ''
+  kubeApiServer:
+    enabled: true
+  kubeControllerManager:
+    enabled: true
+  kubeDns:
+    enabled: true
+  kubeEtcd:
+    enabled: true
+  kubeProxy:
+    enabled: true
+  kubeScheduler:
+    enabled: true
+  kubeStateMetrics:
+    enabled: true
+  kubelet:
+    enabled: true
+    namespace: kube-system
+  prometheus:
+    enabled: true
+    prometheusSpec:
+      additionalScrapeConfigs:
+      - job_name: gpu-metrics
+        kubernetes_sd_configs:
+        - namespaces:
+            names:
+            - nvidia-gpu-operator
+          role: endpoints
+        metrics_path: /metrics
+        scheme: http
+        scrape_interval: 15s
+      - job_name: app-metrics
+        kubernetes_sd_configs:
+        - role: pod
+        metrics_path: /metrics
+        relabel_configs:
+        - action: keep
+          regex: true
+          source_labels:
+          - __meta_kubernetes_pod_annotation_prometheus_io_scrape
+        - action: labelmap
+          regex: __meta_kubernetes_pod_label_(.+)
+        scheme: http
+        scrape_interval: 15s
+      remoteWrite: []
+      storageSpec: {}
+    service:
+      externalIPs: []
+      externalTrafficPolicy: Cluster
+      nodePort: 30090
+      port: 9090
+      targetPort: 9090
+      type: NodePort
+    thanosService:
+      enabled: false
+    thanosServiceExternal:
+      enabled: false
+    thanosServiceMonitor:
+      enabled: false
+  prometheus-node-exporter:
+    namespaceOverride: ''
+  prometheusOperator:
+    enabled: true
+
+
+
+configs:
+  config.yaml:
+    SampleConfig:
+      sampleValue: 0
+

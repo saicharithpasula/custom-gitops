@@ -1,0 +1,24 @@
+Component:
+  app-version: ''
+  description: Developer tests for mdx-local-path-provisioner service
+  helmUrlLocationPath: ''
+  name: mdx-local-path-provisioner-dev-params1
+  version: 1.0.0
+applicationSpecs: {}
+global: {}
+ingress: {}
+local-path-provisioner:
+  configmap:
+    name: mdx-local-path-config
+  defaultPathForNonListedNodes: /opt/mdx-local-path
+  nodePathMap:
+  - node: DEFAULT_PATH_FOR_NON_LISTED_NODES
+    paths:
+    - /opt/mdx-local-path
+  storageClass:
+    name: mdx-local-path
+    reclaimPolicy: Retain
+  stringToEcho: someOtherString
+  timeToSleep: 1200000
+
+

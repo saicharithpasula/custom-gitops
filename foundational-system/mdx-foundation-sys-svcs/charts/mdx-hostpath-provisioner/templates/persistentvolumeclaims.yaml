@@ -1,0 +1,18 @@
+{{- $chart := .Chart -}}
+{{- $topValues := .Values }}
+{{- range $claimName, $claimData := $topValues.storageClaims }}
+{{- if $claimData.spec }}
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: {{ $.Chart.Name }}-{{ $claimName }}-pvc
+  labels:
+    name: {{ $.Chart.Name }}-{{ $claimName }}-pvc
+{{ include "hb.labels.standard" . | indent 4 }}
+spec:
+  {{- with $claimData.spec}}
+  {{- toYaml . | nindent 2 }}
+  {{- end }}
+{{- end }}
+{{- end }}

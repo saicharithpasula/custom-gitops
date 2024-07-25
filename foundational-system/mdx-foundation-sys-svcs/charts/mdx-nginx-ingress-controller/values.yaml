@@ -1,0 +1,19 @@
+# Override values for nginx-ingres-controller.
+nginx-ingress:
+  controller:
+    replicaCount: 2
+    minAvailable: 1
+    nodeSelector: {}
+    service:
+      enabled: true
+      # type: LoadBalancer
+      # externalIPs: [10.32.187.45]
+      type: NodePort
+      nodePorts:
+        http: 31080
+        https: 31443
+    admissionWebhooks:
+      patch:
+        nodeSelector: {}
+  defaultBackend:
+    nodeSelector: {}

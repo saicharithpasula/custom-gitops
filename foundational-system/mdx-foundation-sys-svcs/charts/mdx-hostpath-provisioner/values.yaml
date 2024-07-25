@@ -1,0 +1,17 @@
+Component:
+  app-version: 0.2.13
+  description: wrapper host path provisioner
+  helmUrlLocationPath: file://../packages/hostpath-provisioner-0.2.13.tgz
+  name: mdx-hostpath-provisioner
+  version: v1.0
+hostpath-provisioner:
+  nodeHostPath: /opt/hostpath
+  nodeSelector: {}
+  provisionerName: hostpath-provisioner
+  reclaimPolicy: Retain
+  storageClass:
+    create: true
+    defaultClass: false
+    name: mdx-hostpath
+
+

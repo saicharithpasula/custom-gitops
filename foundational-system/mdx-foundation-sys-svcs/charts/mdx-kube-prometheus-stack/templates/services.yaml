@@ -1,0 +1,37 @@
+{{- $topValues := .Values }}
+{{- if $topValues.applicationSpecs }}
+{{- range $appName, $appData := $topValues.applicationSpecs }}
+{{- range $svcName, $svcData := $appData.services }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  {{- if $svcData.nameOverride }}
+  name: {{ $appName }}-{{ $svcName }}
+  {{- else if $svcData.fullNameOverride  }}
+  name: {{ $svcName }}
+  {{- else }}
+  name: {{ $.Chart.Name }}-{{ $appName }}-{{ $svcName }}
+  {{- end }}
+  labels:
+    app: {{ $.Chart.Name }}-{{ $appName }}
+{{ include "hb.labels.standard" . | indent 4 }}
+{{- include "std-helm.labels" $ | nindent 4 }}
+spec:
+  {{- if eq $appData.apptype "statefull" }}
+  {{- if $svcData.clusterIP }}
+  {{- if eq $svcData.clusterIP "None" }}
+  clusterIP: None
+  {{- end }}
+  {{- end }}
+  {{- end }}
+  selector:
+    app: {{ $.Chart.Name }}-{{ $appName }}
+  {{- if $svcData.type }}
+  type: {{ $svcData.type }}
+  {{- end }}
+  ports:
+  {{- $svcData.ports | toYaml | nindent 2}}
+{{- end }}
+{{- end }}
+{{- end }}

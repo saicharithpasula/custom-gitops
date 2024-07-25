@@ -1,0 +1,10 @@
+apiVersion: v2
+appVersion: v1.0
+dependencies:
+- name: kube-prometheus-stack
+  repository: ""
+  version: 43.2.0
+description: foundation service helm chart for prometheus monitoring
+name: mdx-kube-prometheus-stack
+type: application
+version: 1.0.3

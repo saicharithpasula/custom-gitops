@@ -1,0 +1,13 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: kubernetesdeploymentdemo
+  namespace: gitopsdemo
+  annotations:
+    clusterconfig.azure.com/use-managed-source: "true"
+spec:
+  interval: 1m
+  releaseName: kubernetesdeploymentdemo
+  chart: 
+    spec:
+      chart: ./foundational-system/mdx-foundation-sys-svcs

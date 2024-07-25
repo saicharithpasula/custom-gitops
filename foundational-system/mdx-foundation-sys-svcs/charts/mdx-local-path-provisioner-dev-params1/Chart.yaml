@@ -1,0 +1,9 @@
+apiVersion: v2
+dependencies:
+- name: local-path-provisioner
+  repository: ""
+  version: 1.0.0
+description: Developer tests for mdx-local-path-provisioner service
+name: mdx-local-path-provisioner-dev-params1
+type: application
+version: 1.0.0

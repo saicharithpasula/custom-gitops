@@ -1,0 +1,39 @@
+Component:
+  app-version: 1.1.3
+  description: my test helm chart
+  helmUrlLocationPath:
+    dev: https://helm.ngc.nvidia.com/nv-mdx/charts
+    qa: https://helm.ngc.nvidia.com/nv-metropolis-dev/qa/charts
+  name: mdx-nfs-server-provisioner
+  version: v1.0
+local-path-provisioner:
+  configmap:
+    name: mdx-local-path-nfs-config
+  fullnameOverride: mdx-foundation-svc-nfs-local-path-prov
+  nameOverride: mdx-foundational-svc-nfs-local-path-prov
+  nodePathMap:
+  - node: DEFAULT_PATH_FOR_NON_LISTED_NODES
+    paths:
+    - /opt/mdx-local-nfs-path
+  serviceAccount:
+    name: mdx-local-nfs-path-prov-sa
+  storageClass:
+    name: mdx-local-nfs-path
+nfs-server-provisioner:
+  accessMode: ReadWriteOnce
+  fullnameOverride: mdx-foundation-nfs-prov
+  nameOverride: mdx-foundational-nfs-prov
+  nodeSelector: {}
+  persistence:
+    enabled: true
+    storageClass: mdx-local-nfs-path
+  rbac:
+    create: true
+  replicaCount: 1
+  resources: {}
+  size: 100Gi
+  storageClass:
+    name: mdx-nfs
+    reclaimPolicy: Retain
+
+
