@@ -1,0 +1,15 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: kubernetesdeploymentdemo
+  namespace: kubernetesdeploymentdemo
+  annotations:
+    clusterconfig.azure.com/use-managed-source: "true"
+spec:
+  interval: 1m
+  releaseName: kubernetesdeploymentdemo
+  chart: 
+    spec:
+      chart: ./foundational-system/fsl-chart/fsl-app
+  values:
+    replicaCount: 2

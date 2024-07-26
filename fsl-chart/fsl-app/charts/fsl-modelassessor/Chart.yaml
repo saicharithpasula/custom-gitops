@@ -1,0 +1,6 @@
+apiVersion: v2
+appVersion: 0.2.14
+description: model assessor component for fsl
+name: fsl-modelassessor
+type: application
+version: 0.2.14

@@ -1,0 +1,1581 @@
+
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: {{ $.Chart.Name }}-configs-cm
+  labels:
+{{ include "hb.labels.standard" . | indent 4 }}
+{{- include "std-helm.labels" $ | nindent 4 }}
+data:
+  mtmc_pgie_config.txt: |
+    [property]
+    gpu-id = {{index .Values.configs "mtmc_pgie_config.txt" "property" "gpu-id"}}
+    net-scale-factor = {{index .Values.configs "mtmc_pgie_config.txt" "property" "net-scale-factor"}}
+    infer-dims = {{index .Values.configs "mtmc_pgie_config.txt" "property" "infer-dims"}}
+    uff-input-blob-name = {{index .Values.configs "mtmc_pgie_config.txt" "property" "uff-input-blob-name"}}
+    process-mode = {{index .Values.configs "mtmc_pgie_config.txt" "property" "process-mode"}}
+    model-color-format = {{index .Values.configs "mtmc_pgie_config.txt" "property" "model-color-format"}}
+    network-mode = {{index .Values.configs "mtmc_pgie_config.txt" "property" "network-mode"}}
+    num-detected-classes = {{index .Values.configs "mtmc_pgie_config.txt" "property" "num-detected-classes"}}
+    interval = {{index .Values.configs "mtmc_pgie_config.txt" "property" "interval"}}
+    gie-unique-id = {{index .Values.configs "mtmc_pgie_config.txt" "property" "gie-unique-id"}}
+    cluster-mode = {{index .Values.configs "mtmc_pgie_config.txt" "property" "cluster-mode"}}
+    maintain-aspect-ratio = {{index .Values.configs "mtmc_pgie_config.txt" "property" "maintain-aspect-ratio"}}
+    model-engine-file = {{index .Values.configs "mtmc_pgie_config.txt" "property" "model-engine-file"}}
+    tlt-encoded-model = {{index .Values.configs "mtmc_pgie_config.txt" "property" "tlt-encoded-model"}}
+    int8-calib-file = {{index .Values.configs "mtmc_pgie_config.txt" "property" "int8-calib-file"}}
+    tlt-model-key = {{index .Values.configs "mtmc_pgie_config.txt" "property" "tlt-model-key"}}
+    labelfile-path = {{index .Values.configs "mtmc_pgie_config.txt" "property" "labelfile-path"}}
+    output-blob-names = {{index .Values.configs "mtmc_pgie_config.txt" "property" "output-blob-names"}}
+
+    [class-attrs-all]
+    pre-cluster-threshold = {{index .Values.configs "mtmc_pgie_config.txt" "class-attrs-all" "pre-cluster-threshold"}}
+    nms-iou-threshold = {{index .Values.configs "mtmc_pgie_config.txt" "class-attrs-all" "nms-iou-threshold"}}
+    minboxes = {{index .Values.configs "mtmc_pgie_config.txt" "class-attrs-all" "minboxes"}}
+    dbscan-min-score = {{index .Values.configs "mtmc_pgie_config.txt" "class-attrs-all" "dbscan-min-score"}}
+    eps = {{index .Values.configs "mtmc_pgie_config.txt" "class-attrs-all" "eps"}}
+    detected-min-w = {{index .Values.configs "mtmc_pgie_config.txt" "class-attrs-all" "detected-min-w"}}
+    detected-min-h = {{index .Values.configs "mtmc_pgie_config.txt" "class-attrs-all" "detected-min-h"}}
+
+
+  fsl_config.properties: |
+    [application]
+    enable-perf-measurement = {{index .Values.configs "fsl_config.properties" "application" "enable-perf-measurement"}}
+    perf-measurement-interval-sec = {{index .Values.configs "fsl_config.properties" "application" "perf-measurement-interval-sec"}}
+
+    [tiled-display]
+    enable = {{index .Values.configs "fsl_config.properties" "tiled-display" "enable"}}
+    rows = {{index .Values.configs "fsl_config.properties" "tiled-display" "rows"}}
+    columns = {{index .Values.configs "fsl_config.properties" "tiled-display" "columns"}}
+    width = {{index .Values.configs "fsl_config.properties" "tiled-display" "width"}}
+    height = {{index .Values.configs "fsl_config.properties" "tiled-display" "height"}}
+    gpu-id = {{index .Values.configs "fsl_config.properties" "tiled-display" "gpu-id"}}
+    nvbuf-memory-type = {{index .Values.configs "fsl_config.properties" "tiled-display" "nvbuf-memory-type"}}
+
+    [sourceTemplate]
+    enable = {{index .Values.configs "fsl_config.properties" "sourceTemplate" "enable"}}
+    type = {{index .Values.configs "fsl_config.properties" "sourceTemplate" "type"}}
+    uri = {{index .Values.configs "fsl_config.properties" "sourceTemplate" "uri"}}
+    num-sources = {{index .Values.configs "fsl_config.properties" "sourceTemplate" "num-sources"}}
+    gpu-id = {{index .Values.configs "fsl_config.properties" "sourceTemplate" "gpu-id"}}
+    nvbuf-memory-type = {{index .Values.configs "fsl_config.properties" "sourceTemplate" "nvbuf-memory-type"}}
+    latency = {{index .Values.configs "fsl_config.properties" "sourceTemplate" "latency"}}
+    rtsp-reconnect-interval-sec = {{index .Values.configs "fsl_config.properties" "sourceTemplate" "rtsp-reconnect-interval-sec"}}
+    select-rtp-protocol = {{index .Values.configs "fsl_config.properties" "sourceTemplate" "select-rtp-protocol"}}
+
+    [sink0]
+    enable = {{index .Values.configs "fsl_config.properties" "sink0" "enable"}}
+    type = {{index .Values.configs "fsl_config.properties" "sink0" "type"}}
+    sync = {{index .Values.configs "fsl_config.properties" "sink0" "sync"}}
+    source-id = {{index .Values.configs "fsl_config.properties" "sink0" "source-id"}}
+    gpu-id = {{index .Values.configs "fsl_config.properties" "sink0" "gpu-id"}}
+    nvbuf-memory-type = {{index .Values.configs "fsl_config.properties" "sink0" "nvbuf-memory-type"}}
+
+    [sink1]
+    enable = {{index .Values.configs "fsl_config.properties" "sink1" "enable"}}
+    type = {{index .Values.configs "fsl_config.properties" "sink1" "type"}}
+    msg-conv-config = {{index .Values.configs "fsl_config.properties" "sink1" "msg-conv-config"}}
+    msg-conv-payload-type = {{index .Values.configs "fsl_config.properties" "sink1" "msg-conv-payload-type"}}
+    msg-conv-msg2p-new-api = {{index .Values.configs "fsl_config.properties" "sink1" "msg-conv-msg2p-new-api"}}
+    msg-conv-frame-interval = {{index .Values.configs "fsl_config.properties" "sink1" "msg-conv-frame-interval"}}
+    msg-broker-proto-lib = {{index .Values.configs "fsl_config.properties" "sink1" "msg-broker-proto-lib"}}
+    msg-broker-conn-str = {{index .Values.configs "fsl_config.properties" "sink1" "msg-broker-conn-str"}}
+    topic = {{index .Values.configs "fsl_config.properties" "sink1" "topic"}}
+
+    [sink2]
+    enable = {{index .Values.configs "fsl_config.properties" "sink2" "enable"}}
+    type = {{index .Values.configs "fsl_config.properties" "sink2" "type"}}
+    container = {{index .Values.configs "fsl_config.properties" "sink2" "container"}}
+    codec = {{index .Values.configs "fsl_config.properties" "sink2" "codec"}}
+    sync = {{index .Values.configs "fsl_config.properties" "sink2" "sync"}}
+    bitrate = {{index .Values.configs "fsl_config.properties" "sink2" "bitrate"}}
+    output-file = {{index .Values.configs "fsl_config.properties" "sink2" "output-file"}}
+    source-id = {{index .Values.configs "fsl_config.properties" "sink2" "source-id"}}
+
+    [message-converter]
+    enable = {{index .Values.configs "fsl_config.properties" "message-converter" "enable"}}
+    msg-conv-config = {{index .Values.configs "fsl_config.properties" "message-converter" "msg-conv-config"}}
+    msg-conv-payload-type = {{index .Values.configs "fsl_config.properties" "message-converter" "msg-conv-payload-type"}}
+
+    [message-consumer0]
+    enable = {{index .Values.configs "fsl_config.properties" "message-consumer0" "enable"}}
+    proto-lib = {{index .Values.configs "fsl_config.properties" "message-consumer0" "proto-lib"}}
+    conn-str = {{index .Values.configs "fsl_config.properties" "message-consumer0" "conn-str"}}
+    config-file = {{index .Values.configs "fsl_config.properties" "message-consumer0" "config-file"}}
+    subscribe-topic-list = {{index .Values.configs "fsl_config.properties" "message-consumer0" "subscribe-topic-list"}}
+
+    [osd]
+    enable = {{index .Values.configs "fsl_config.properties" "osd" "enable"}}
+    gpu-id = {{index .Values.configs "fsl_config.properties" "osd" "gpu-id"}}
+    border-width = {{index .Values.configs "fsl_config.properties" "osd" "border-width"}}
+    text-size = {{index .Values.configs "fsl_config.properties" "osd" "text-size"}}
+    text-color = {{index .Values.configs "fsl_config.properties" "osd" "text-color"}}
+    text-bg-color = {{index .Values.configs "fsl_config.properties" "osd" "text-bg-color"}}
+    font = {{index .Values.configs "fsl_config.properties" "osd" "font"}}
+    show-clock = {{index .Values.configs "fsl_config.properties" "osd" "show-clock"}}
+    clock-x-offset = {{index .Values.configs "fsl_config.properties" "osd" "clock-x-offset"}}
+    clock-y-offset = {{index .Values.configs "fsl_config.properties" "osd" "clock-y-offset"}}
+    clock-text-size = {{index .Values.configs "fsl_config.properties" "osd" "clock-text-size"}}
+    clock-color = {{index .Values.configs "fsl_config.properties" "osd" "clock-color"}}
+    nvbuf-memory-type = {{index .Values.configs "fsl_config.properties" "osd" "nvbuf-memory-type"}}
+
+    [streammux]
+    gpu-id = {{index .Values.configs "fsl_config.properties" "streammux" "gpu-id"}}
+    live-source = {{index .Values.configs "fsl_config.properties" "streammux" "live-source"}}
+    batch-size = {{index .Values.configs "fsl_config.properties" "streammux" "batch-size"}}
+    batched-push-timeout = {{index .Values.configs "fsl_config.properties" "streammux" "batched-push-timeout"}}
+    width = {{index .Values.configs "fsl_config.properties" "streammux" "width"}}
+    height = {{index .Values.configs "fsl_config.properties" "streammux" "height"}}
+    enable-padding = {{index .Values.configs "fsl_config.properties" "streammux" "enable-padding"}}
+    nvbuf-memory-type = {{index .Values.configs "fsl_config.properties" "streammux" "nvbuf-memory-type"}}
+    attach-sys-ts-as-ntp = {{index .Values.configs "fsl_config.properties" "streammux" "attach-sys-ts-as-ntp"}}
+
+    [primary-gie]
+    enable = {{index .Values.configs "fsl_config.properties" "primary-gie" "enable"}}
+    gpu-id = {{index .Values.configs "fsl_config.properties" "primary-gie" "gpu-id"}}
+    labelfile-path = {{index .Values.configs "fsl_config.properties" "primary-gie" "labelfile-path"}}
+    batch-size = {{index .Values.configs "fsl_config.properties" "primary-gie" "batch-size"}}
+    interval = {{index .Values.configs "fsl_config.properties" "primary-gie" "interval"}}
+    gie-unique-id = {{index .Values.configs "fsl_config.properties" "primary-gie" "gie-unique-id"}}
+    config-file = {{index .Values.configs "fsl_config.properties" "primary-gie" "config-file"}}
+
+    [tracker]
+    enable = {{index .Values.configs "fsl_config.properties" "tracker" "enable"}}
+    tracker-width = {{index .Values.configs "fsl_config.properties" "tracker" "tracker-width"}}
+    tracker-height = {{index .Values.configs "fsl_config.properties" "tracker" "tracker-height"}}
+    ll-lib-file = {{index .Values.configs "fsl_config.properties" "tracker" "ll-lib-file"}}
+    ll-config-file = {{index .Values.configs "fsl_config.properties" "tracker" "ll-config-file"}}
+    gpu-id = {{index .Values.configs "fsl_config.properties" "tracker" "gpu-id"}}
+    enable-batch-process = {{index .Values.configs "fsl_config.properties" "tracker" "enable-batch-process"}}
+    enable-past-frame = {{index .Values.configs "fsl_config.properties" "tracker" "enable-past-frame"}}
+    display-tracking-id = {{index .Values.configs "fsl_config.properties" "tracker" "display-tracking-id"}}
+
+    [secondary-gie0]
+    enable = {{index .Values.configs "fsl_config.properties" "secondary-gie0" "enable"}}
+    gpu-id = {{index .Values.configs "fsl_config.properties" "secondary-gie0" "gpu-id"}}
+    gie-unique-id = {{index .Values.configs "fsl_config.properties" "secondary-gie0" "gie-unique-id"}}
+    operate-on-gie-id = {{index .Values.configs "fsl_config.properties" "secondary-gie0" "operate-on-gie-id"}}
+    batch-size = {{index .Values.configs "fsl_config.properties" "secondary-gie0" "batch-size"}}
+    interval = {{index .Values.configs "fsl_config.properties" "secondary-gie0" "interval"}}
+    config-file = {{index .Values.configs "fsl_config.properties" "secondary-gie0" "config-file"}}
+
+    [tests]
+    file-loop = {{index .Values.configs "fsl_config.properties" "tests" "file-loop"}}
+
+
+  ppl_analytics_config_init.txt: |
+    [application]
+    enable-perf-measurement = {{index .Values.configs "ppl_analytics_config_init.txt" "application" "enable-perf-measurement"}}
+    perf-measurement-interval-sec = {{index .Values.configs "ppl_analytics_config_init.txt" "application" "perf-measurement-interval-sec"}}
+
+    [tiled-display]
+    enable = {{index .Values.configs "ppl_analytics_config_init.txt" "tiled-display" "enable"}}
+    rows = {{index .Values.configs "ppl_analytics_config_init.txt" "tiled-display" "rows"}}
+    columns = {{index .Values.configs "ppl_analytics_config_init.txt" "tiled-display" "columns"}}
+    width = {{index .Values.configs "ppl_analytics_config_init.txt" "tiled-display" "width"}}
+    height = {{index .Values.configs "ppl_analytics_config_init.txt" "tiled-display" "height"}}
+    gpu-id = {{index .Values.configs "ppl_analytics_config_init.txt" "tiled-display" "gpu-id"}}
+    nvbuf-memory-type = {{index .Values.configs "ppl_analytics_config_init.txt" "tiled-display" "nvbuf-memory-type"}}
+
+    [source-list]
+    num-source-bins = {{index .Values.configs "ppl_analytics_config_init.txt" "source-list" "num-source-bins"}}
+    list = {{index .Values.configs "ppl_analytics_config_init.txt" "source-list" "list"}}
+    use-nvmultiurisrcbin = {{index .Values.configs "ppl_analytics_config_init.txt" "source-list" "use-nvmultiurisrcbin"}}
+    max-batch-size = {{index .Values.configs "ppl_analytics_config_init.txt" "source-list" "max-batch-size"}}
+    http-ip = {{index .Values.configs "ppl_analytics_config_init.txt" "source-list" "http-ip"}}
+    http-port = {{index .Values.configs "ppl_analytics_config_init.txt" "source-list" "http-port"}}
+    sgie-batch-size = {{index .Values.configs "ppl_analytics_config_init.txt" "source-list" "sgie-batch-size"}}
+
+    [source-attr-all]
+    enable = {{index .Values.configs "ppl_analytics_config_init.txt" "source-attr-all" "enable"}}
+    type = {{index .Values.configs "ppl_analytics_config_init.txt" "source-attr-all" "type"}}
+    num-sources = {{index .Values.configs "ppl_analytics_config_init.txt" "source-attr-all" "num-sources"}}
+    gpu-id = {{index .Values.configs "ppl_analytics_config_init.txt" "source-attr-all" "gpu-id"}}
+    cudadec-memtype = {{index .Values.configs "ppl_analytics_config_init.txt" "source-attr-all" "cudadec-memtype"}}
+    latency = {{index .Values.configs "ppl_analytics_config_init.txt" "source-attr-all" "latency"}}
+    rtsp-reconnect-interval-sec = {{index .Values.configs "ppl_analytics_config_init.txt" "source-attr-all" "rtsp-reconnect-interval-sec"}}
+
+    [sink0]
+    enable = {{index .Values.configs "ppl_analytics_config_init.txt" "sink0" "enable"}}
+    type = {{index .Values.configs "ppl_analytics_config_init.txt" "sink0" "type"}}
+    sync = {{index .Values.configs "ppl_analytics_config_init.txt" "sink0" "sync"}}
+    source-id = {{index .Values.configs "ppl_analytics_config_init.txt" "sink0" "source-id"}}
+    gpu-id = {{index .Values.configs "ppl_analytics_config_init.txt" "sink0" "gpu-id"}}
+    nvbuf-memory-type = {{index .Values.configs "ppl_analytics_config_init.txt" "sink0" "nvbuf-memory-type"}}
+
+    [sink1]
+    enable = {{index .Values.configs "ppl_analytics_config_init.txt" "sink1" "enable"}}
+    type = {{index .Values.configs "ppl_analytics_config_init.txt" "sink1" "type"}}
+    msg-conv-config = {{index .Values.configs "ppl_analytics_config_init.txt" "sink1" "msg-conv-config"}}
+    msg-conv-payload-type = {{index .Values.configs "ppl_analytics_config_init.txt" "sink1" "msg-conv-payload-type"}}
+    msg-conv-msg2p-new-api = {{index .Values.configs "ppl_analytics_config_init.txt" "sink1" "msg-conv-msg2p-new-api"}}
+    msg-conv-frame-interval = {{index .Values.configs "ppl_analytics_config_init.txt" "sink1" "msg-conv-frame-interval"}}
+    msg-broker-proto-lib = {{index .Values.configs "ppl_analytics_config_init.txt" "sink1" "msg-broker-proto-lib"}}
+    msg-broker-conn-str = {{index .Values.configs "ppl_analytics_config_init.txt" "sink1" "msg-broker-conn-str"}}
+    topic = {{index .Values.configs "ppl_analytics_config_init.txt" "sink1" "topic"}}
+    msg-broker-config = {{index .Values.configs "ppl_analytics_config_init.txt" "sink1" "msg-broker-config"}}
+
+    [sink2]
+    enable = {{index .Values.configs "ppl_analytics_config_init.txt" "sink2" "enable"}}
+    type = {{index .Values.configs "ppl_analytics_config_init.txt" "sink2" "type"}}
+    container = {{index .Values.configs "ppl_analytics_config_init.txt" "sink2" "container"}}
+    codec = {{index .Values.configs "ppl_analytics_config_init.txt" "sink2" "codec"}}
+    sync = {{index .Values.configs "ppl_analytics_config_init.txt" "sink2" "sync"}}
+    bitrate = {{index .Values.configs "ppl_analytics_config_init.txt" "sink2" "bitrate"}}
+    output-file = {{index .Values.configs "ppl_analytics_config_init.txt" "sink2" "output-file"}}
+    source-id = {{index .Values.configs "ppl_analytics_config_init.txt" "sink2" "source-id"}}
+
+    [message-converter]
+    enable = {{index .Values.configs "ppl_analytics_config_init.txt" "message-converter" "enable"}}
+    msg-conv-config = {{index .Values.configs "ppl_analytics_config_init.txt" "message-converter" "msg-conv-config"}}
+    msg-conv-payload-type = {{index .Values.configs "ppl_analytics_config_init.txt" "message-converter" "msg-conv-payload-type"}}
+
+    [message-consumer0]
+    enable = {{index .Values.configs "ppl_analytics_config_init.txt" "message-consumer0" "enable"}}
+    proto-lib = {{index .Values.configs "ppl_analytics_config_init.txt" "message-consumer0" "proto-lib"}}
+    conn-str = {{index .Values.configs "ppl_analytics_config_init.txt" "message-consumer0" "conn-str"}}
+    config-file = {{index .Values.configs "ppl_analytics_config_init.txt" "message-consumer0" "config-file"}}
+    subscribe-topic-list = {{index .Values.configs "ppl_analytics_config_init.txt" "message-consumer0" "subscribe-topic-list"}}
+
+    [osd]
+    enable = {{index .Values.configs "ppl_analytics_config_init.txt" "osd" "enable"}}
+    gpu-id = {{index .Values.configs "ppl_analytics_config_init.txt" "osd" "gpu-id"}}
+    border-width = {{index .Values.configs "ppl_analytics_config_init.txt" "osd" "border-width"}}
+    text-size = {{index .Values.configs "ppl_analytics_config_init.txt" "osd" "text-size"}}
+    text-color = {{index .Values.configs "ppl_analytics_config_init.txt" "osd" "text-color"}}
+    text-bg-color = {{index .Values.configs "ppl_analytics_config_init.txt" "osd" "text-bg-color"}}
+    font = {{index .Values.configs "ppl_analytics_config_init.txt" "osd" "font"}}
+    show-clock = {{index .Values.configs "ppl_analytics_config_init.txt" "osd" "show-clock"}}
+    clock-x-offset = {{index .Values.configs "ppl_analytics_config_init.txt" "osd" "clock-x-offset"}}
+    clock-y-offset = {{index .Values.configs "ppl_analytics_config_init.txt" "osd" "clock-y-offset"}}
+    clock-text-size = {{index .Values.configs "ppl_analytics_config_init.txt" "osd" "clock-text-size"}}
+    clock-color = {{index .Values.configs "ppl_analytics_config_init.txt" "osd" "clock-color"}}
+    nvbuf-memory-type = {{index .Values.configs "ppl_analytics_config_init.txt" "osd" "nvbuf-memory-type"}}
+
+    [streammux]
+    gpu-id = {{index .Values.configs "ppl_analytics_config_init.txt" "streammux" "gpu-id"}}
+    live-source = {{index .Values.configs "ppl_analytics_config_init.txt" "streammux" "live-source"}}
+    batch-size = {{index .Values.configs "ppl_analytics_config_init.txt" "streammux" "batch-size"}}
+    batched-push-timeout = {{index .Values.configs "ppl_analytics_config_init.txt" "streammux" "batched-push-timeout"}}
+    width = {{index .Values.configs "ppl_analytics_config_init.txt" "streammux" "width"}}
+    height = {{index .Values.configs "ppl_analytics_config_init.txt" "streammux" "height"}}
+    enable-padding = {{index .Values.configs "ppl_analytics_config_init.txt" "streammux" "enable-padding"}}
+    nvbuf-memory-type = {{index .Values.configs "ppl_analytics_config_init.txt" "streammux" "nvbuf-memory-type"}}
+    attach-sys-ts-as-ntp = {{index .Values.configs "ppl_analytics_config_init.txt" "streammux" "attach-sys-ts-as-ntp"}}
+    drop-pipeline-eos = {{index .Values.configs "ppl_analytics_config_init.txt" "streammux" "drop-pipeline-eos"}}
+
+    [primary-gie]
+    enable = {{index .Values.configs "ppl_analytics_config_init.txt" "primary-gie" "enable"}}
+    gpu-id = {{index .Values.configs "ppl_analytics_config_init.txt" "primary-gie" "gpu-id"}}
+    batch-size = {{index .Values.configs "ppl_analytics_config_init.txt" "primary-gie" "batch-size"}}
+    bbox-border-color0 = {{index .Values.configs "ppl_analytics_config_init.txt" "primary-gie" "bbox-border-color0"}}
+    bbox-border-color1 = {{index .Values.configs "ppl_analytics_config_init.txt" "primary-gie" "bbox-border-color1"}}
+    bbox-border-color2 = {{index .Values.configs "ppl_analytics_config_init.txt" "primary-gie" "bbox-border-color2"}}
+    bbox-border-color3 = {{index .Values.configs "ppl_analytics_config_init.txt" "primary-gie" "bbox-border-color3"}}
+    interval = {{index .Values.configs "ppl_analytics_config_init.txt" "primary-gie" "interval"}}
+    gie-unique-id = {{index .Values.configs "ppl_analytics_config_init.txt" "primary-gie" "gie-unique-id"}}
+    nvbuf-memory-type = {{index .Values.configs "ppl_analytics_config_init.txt" "primary-gie" "nvbuf-memory-type"}}
+    config-file = {{index .Values.configs "ppl_analytics_config_init.txt" "primary-gie" "config-file"}}
+
+    [tracker]
+    enable = {{index .Values.configs "ppl_analytics_config_init.txt" "tracker" "enable"}}
+    tracker-width = {{index .Values.configs "ppl_analytics_config_init.txt" "tracker" "tracker-width"}}
+    tracker-height = {{index .Values.configs "ppl_analytics_config_init.txt" "tracker" "tracker-height"}}
+    ll-lib-file = {{index .Values.configs "ppl_analytics_config_init.txt" "tracker" "ll-lib-file"}}
+    ll-config-file = {{index .Values.configs "ppl_analytics_config_init.txt" "tracker" "ll-config-file"}}
+    gpu-id = {{index .Values.configs "ppl_analytics_config_init.txt" "tracker" "gpu-id"}}
+    enable-batch-process = {{index .Values.configs "ppl_analytics_config_init.txt" "tracker" "enable-batch-process"}}
+    enable-past-frame = {{index .Values.configs "ppl_analytics_config_init.txt" "tracker" "enable-past-frame"}}
+    display-tracking-id = {{index .Values.configs "ppl_analytics_config_init.txt" "tracker" "display-tracking-id"}}
+
+    [secondary-gie0]
+    enable = {{index .Values.configs "ppl_analytics_config_init.txt" "secondary-gie0" "enable"}}
+    gpu-id = {{index .Values.configs "ppl_analytics_config_init.txt" "secondary-gie0" "gpu-id"}}
+    gie-unique-id = {{index .Values.configs "ppl_analytics_config_init.txt" "secondary-gie0" "gie-unique-id"}}
+    operate-on-gie-id = {{index .Values.configs "ppl_analytics_config_init.txt" "secondary-gie0" "operate-on-gie-id"}}
+    operate-on-class-ids = {{index .Values.configs "ppl_analytics_config_init.txt" "secondary-gie0" "operate-on-class-ids"}}
+    batch-size = {{index .Values.configs "ppl_analytics_config_init.txt" "secondary-gie0" "batch-size"}}
+    config-file = {{index .Values.configs "ppl_analytics_config_init.txt" "secondary-gie0" "config-file"}}
+
+    [tests]
+    file-loop = {{index .Values.configs "ppl_analytics_config_init.txt" "tests" "file-loop"}}
+
+
+  mtmc_msgconv_config.txt: |
+    [sensor0]
+    enable = {{index .Values.configs "mtmc_msgconv_config.txt" "sensor0" "enable"}}
+    type = {{index .Values.configs "mtmc_msgconv_config.txt" "sensor0" "type"}}
+    id = {{index .Values.configs "mtmc_msgconv_config.txt" "sensor0" "id"}}
+    location = {{index .Values.configs "mtmc_msgconv_config.txt" "sensor0" "location"}}
+    description = {{index .Values.configs "mtmc_msgconv_config.txt" "sensor0" "description"}}
+    coordinate = {{index .Values.configs "mtmc_msgconv_config.txt" "sensor0" "coordinate"}}
+
+    [place0]
+    enable = {{index .Values.configs "mtmc_msgconv_config.txt" "place0" "enable"}}
+    id = {{index .Values.configs "mtmc_msgconv_config.txt" "place0" "id"}}
+    type = {{index .Values.configs "mtmc_msgconv_config.txt" "place0" "type"}}
+    name = {{index .Values.configs "mtmc_msgconv_config.txt" "place0" "name"}}
+    location = {{index .Values.configs "mtmc_msgconv_config.txt" "place0" "location"}}
+    coordinate = {{index .Values.configs "mtmc_msgconv_config.txt" "place0" "coordinate"}}
+    place-sub-field1 = {{index .Values.configs "mtmc_msgconv_config.txt" "place0" "place-sub-field1"}}
+    place-sub-field2 = {{index .Values.configs "mtmc_msgconv_config.txt" "place0" "place-sub-field2"}}
+    place-sub-field3 = {{index .Values.configs "mtmc_msgconv_config.txt" "place0" "place-sub-field3"}}
+
+    [analytics0]
+    enable = {{index .Values.configs "mtmc_msgconv_config.txt" "analytics0" "enable"}}
+    id = {{index .Values.configs "mtmc_msgconv_config.txt" "analytics0" "id"}}
+    description = {{index .Values.configs "mtmc_msgconv_config.txt" "analytics0" "description"}}
+    source = {{index .Values.configs "mtmc_msgconv_config.txt" "analytics0" "source"}}
+    version = {{index .Values.configs "mtmc_msgconv_config.txt" "analytics0" "version"}}
+
+
+  ppl_analytics_config.txt: |
+    [application]
+    enable-perf-measurement = {{index .Values.configs "ppl_analytics_config.txt" "application" "enable-perf-measurement"}}
+    perf-measurement-interval-sec = {{index .Values.configs "ppl_analytics_config.txt" "application" "perf-measurement-interval-sec"}}
+
+    [tiled-display]
+    enable = {{index .Values.configs "ppl_analytics_config.txt" "tiled-display" "enable"}}
+    rows = {{index .Values.configs "ppl_analytics_config.txt" "tiled-display" "rows"}}
+    columns = {{index .Values.configs "ppl_analytics_config.txt" "tiled-display" "columns"}}
+    width = {{index .Values.configs "ppl_analytics_config.txt" "tiled-display" "width"}}
+    height = {{index .Values.configs "ppl_analytics_config.txt" "tiled-display" "height"}}
+    gpu-id = {{index .Values.configs "ppl_analytics_config.txt" "tiled-display" "gpu-id"}}
+    nvbuf-memory-type = {{index .Values.configs "ppl_analytics_config.txt" "tiled-display" "nvbuf-memory-type"}}
+
+    [source-list]
+    num-source-bins = {{index .Values.configs "ppl_analytics_config.txt" "source-list" "num-source-bins"}}
+    list = {{index .Values.configs "ppl_analytics_config.txt" "source-list" "list"}}
+    use-nvmultiurisrcbin = {{index .Values.configs "ppl_analytics_config.txt" "source-list" "use-nvmultiurisrcbin"}}
+    max-batch-size = {{index .Values.configs "ppl_analytics_config.txt" "source-list" "max-batch-size"}}
+    http-ip = {{index .Values.configs "ppl_analytics_config.txt" "source-list" "http-ip"}}
+    http-port = {{index .Values.configs "ppl_analytics_config.txt" "source-list" "http-port"}}
+    sgie-batch-size = {{index .Values.configs "ppl_analytics_config.txt" "source-list" "sgie-batch-size"}}
+
+    [source-attr-all]
+    enable = {{index .Values.configs "ppl_analytics_config.txt" "source-attr-all" "enable"}}
+    type = {{index .Values.configs "ppl_analytics_config.txt" "source-attr-all" "type"}}
+    num-sources = {{index .Values.configs "ppl_analytics_config.txt" "source-attr-all" "num-sources"}}
+    gpu-id = {{index .Values.configs "ppl_analytics_config.txt" "source-attr-all" "gpu-id"}}
+    cudadec-memtype = {{index .Values.configs "ppl_analytics_config.txt" "source-attr-all" "cudadec-memtype"}}
+    latency = {{index .Values.configs "ppl_analytics_config.txt" "source-attr-all" "latency"}}
+    rtsp-reconnect-interval-sec = {{index .Values.configs "ppl_analytics_config.txt" "source-attr-all" "rtsp-reconnect-interval-sec"}}
+
+    [sink0]
+    enable = {{index .Values.configs "ppl_analytics_config.txt" "sink0" "enable"}}
+    type = {{index .Values.configs "ppl_analytics_config.txt" "sink0" "type"}}
+    sync = {{index .Values.configs "ppl_analytics_config.txt" "sink0" "sync"}}
+    source-id = {{index .Values.configs "ppl_analytics_config.txt" "sink0" "source-id"}}
+    gpu-id = {{index .Values.configs "ppl_analytics_config.txt" "sink0" "gpu-id"}}
+    nvbuf-memory-type = {{index .Values.configs "ppl_analytics_config.txt" "sink0" "nvbuf-memory-type"}}
+
+    [sink1]
+    enable = {{index .Values.configs "ppl_analytics_config.txt" "sink1" "enable"}}
+    type = {{index .Values.configs "ppl_analytics_config.txt" "sink1" "type"}}
+    msg-conv-config = {{index .Values.configs "ppl_analytics_config.txt" "sink1" "msg-conv-config"}}
+    msg-conv-payload-type = {{index .Values.configs "ppl_analytics_config.txt" "sink1" "msg-conv-payload-type"}}
+    msg-conv-msg2p-new-api = {{index .Values.configs "ppl_analytics_config.txt" "sink1" "msg-conv-msg2p-new-api"}}
+    msg-conv-frame-interval = {{index .Values.configs "ppl_analytics_config.txt" "sink1" "msg-conv-frame-interval"}}
+    msg-broker-proto-lib = {{index .Values.configs "ppl_analytics_config.txt" "sink1" "msg-broker-proto-lib"}}
+    msg-broker-conn-str = {{index .Values.configs "ppl_analytics_config.txt" "sink1" "msg-broker-conn-str"}}
+    topic = {{index .Values.configs "ppl_analytics_config.txt" "sink1" "topic"}}
+
+    [sink2]
+    enable = {{index .Values.configs "ppl_analytics_config.txt" "sink2" "enable"}}
+    type = {{index .Values.configs "ppl_analytics_config.txt" "sink2" "type"}}
+    container = {{index .Values.configs "ppl_analytics_config.txt" "sink2" "container"}}
+    codec = {{index .Values.configs "ppl_analytics_config.txt" "sink2" "codec"}}
+    sync = {{index .Values.configs "ppl_analytics_config.txt" "sink2" "sync"}}
+    bitrate = {{index .Values.configs "ppl_analytics_config.txt" "sink2" "bitrate"}}
+    output-file = {{index .Values.configs "ppl_analytics_config.txt" "sink2" "output-file"}}
+    source-id = {{index .Values.configs "ppl_analytics_config.txt" "sink2" "source-id"}}
+
+    [message-converter]
+    enable = {{index .Values.configs "ppl_analytics_config.txt" "message-converter" "enable"}}
+    msg-conv-config = {{index .Values.configs "ppl_analytics_config.txt" "message-converter" "msg-conv-config"}}
+    msg-conv-payload-type = {{index .Values.configs "ppl_analytics_config.txt" "message-converter" "msg-conv-payload-type"}}
+
+    [message-consumer0]
+    enable = {{index .Values.configs "ppl_analytics_config.txt" "message-consumer0" "enable"}}
+    proto-lib = {{index .Values.configs "ppl_analytics_config.txt" "message-consumer0" "proto-lib"}}
+    conn-str = {{index .Values.configs "ppl_analytics_config.txt" "message-consumer0" "conn-str"}}
+    config-file = {{index .Values.configs "ppl_analytics_config.txt" "message-consumer0" "config-file"}}
+    subscribe-topic-list = {{index .Values.configs "ppl_analytics_config.txt" "message-consumer0" "subscribe-topic-list"}}
+
+    [osd]
+    enable = {{index .Values.configs "ppl_analytics_config.txt" "osd" "enable"}}
+    gpu-id = {{index .Values.configs "ppl_analytics_config.txt" "osd" "gpu-id"}}
+    border-width = {{index .Values.configs "ppl_analytics_config.txt" "osd" "border-width"}}
+    text-size = {{index .Values.configs "ppl_analytics_config.txt" "osd" "text-size"}}
+    text-color = {{index .Values.configs "ppl_analytics_config.txt" "osd" "text-color"}}
+    text-bg-color = {{index .Values.configs "ppl_analytics_config.txt" "osd" "text-bg-color"}}
+    font = {{index .Values.configs "ppl_analytics_config.txt" "osd" "font"}}
+    show-clock = {{index .Values.configs "ppl_analytics_config.txt" "osd" "show-clock"}}
+    clock-x-offset = {{index .Values.configs "ppl_analytics_config.txt" "osd" "clock-x-offset"}}
+    clock-y-offset = {{index .Values.configs "ppl_analytics_config.txt" "osd" "clock-y-offset"}}
+    clock-text-size = {{index .Values.configs "ppl_analytics_config.txt" "osd" "clock-text-size"}}
+    clock-color = {{index .Values.configs "ppl_analytics_config.txt" "osd" "clock-color"}}
+    nvbuf-memory-type = {{index .Values.configs "ppl_analytics_config.txt" "osd" "nvbuf-memory-type"}}
+
+    [streammux]
+    gpu-id = {{index .Values.configs "ppl_analytics_config.txt" "streammux" "gpu-id"}}
+    live-source = {{index .Values.configs "ppl_analytics_config.txt" "streammux" "live-source"}}
+    batch-size = {{index .Values.configs "ppl_analytics_config.txt" "streammux" "batch-size"}}
+    batched-push-timeout = {{index .Values.configs "ppl_analytics_config.txt" "streammux" "batched-push-timeout"}}
+    width = {{index .Values.configs "ppl_analytics_config.txt" "streammux" "width"}}
+    height = {{index .Values.configs "ppl_analytics_config.txt" "streammux" "height"}}
+    enable-padding = {{index .Values.configs "ppl_analytics_config.txt" "streammux" "enable-padding"}}
+    nvbuf-memory-type = {{index .Values.configs "ppl_analytics_config.txt" "streammux" "nvbuf-memory-type"}}
+    attach-sys-ts-as-ntp = {{index .Values.configs "ppl_analytics_config.txt" "streammux" "attach-sys-ts-as-ntp"}}
+    drop-pipeline-eos = {{index .Values.configs "ppl_analytics_config.txt" "streammux" "drop-pipeline-eos"}}
+
+    [primary-gie]
+    enable = {{index .Values.configs "ppl_analytics_config.txt" "primary-gie" "enable"}}
+    gpu-id = {{index .Values.configs "ppl_analytics_config.txt" "primary-gie" "gpu-id"}}
+    batch-size = {{index .Values.configs "ppl_analytics_config.txt" "primary-gie" "batch-size"}}
+    bbox-border-color0 = {{index .Values.configs "ppl_analytics_config.txt" "primary-gie" "bbox-border-color0"}}
+    bbox-border-color1 = {{index .Values.configs "ppl_analytics_config.txt" "primary-gie" "bbox-border-color1"}}
+    bbox-border-color2 = {{index .Values.configs "ppl_analytics_config.txt" "primary-gie" "bbox-border-color2"}}
+    bbox-border-color3 = {{index .Values.configs "ppl_analytics_config.txt" "primary-gie" "bbox-border-color3"}}
+    interval = {{index .Values.configs "ppl_analytics_config.txt" "primary-gie" "interval"}}
+    gie-unique-id = {{index .Values.configs "ppl_analytics_config.txt" "primary-gie" "gie-unique-id"}}
+    nvbuf-memory-type = {{index .Values.configs "ppl_analytics_config.txt" "primary-gie" "nvbuf-memory-type"}}
+    config-file = {{index .Values.configs "ppl_analytics_config.txt" "primary-gie" "config-file"}}
+
+    [tracker]
+    enable = {{index .Values.configs "ppl_analytics_config.txt" "tracker" "enable"}}
+    tracker-width = {{index .Values.configs "ppl_analytics_config.txt" "tracker" "tracker-width"}}
+    tracker-height = {{index .Values.configs "ppl_analytics_config.txt" "tracker" "tracker-height"}}
+    ll-lib-file = {{index .Values.configs "ppl_analytics_config.txt" "tracker" "ll-lib-file"}}
+    ll-config-file = {{index .Values.configs "ppl_analytics_config.txt" "tracker" "ll-config-file"}}
+    gpu-id = {{index .Values.configs "ppl_analytics_config.txt" "tracker" "gpu-id"}}
+    enable-batch-process = {{index .Values.configs "ppl_analytics_config.txt" "tracker" "enable-batch-process"}}
+    enable-past-frame = {{index .Values.configs "ppl_analytics_config.txt" "tracker" "enable-past-frame"}}
+    display-tracking-id = {{index .Values.configs "ppl_analytics_config.txt" "tracker" "display-tracking-id"}}
+
+    [secondary-gie0]
+    enable = {{index .Values.configs "ppl_analytics_config.txt" "secondary-gie0" "enable"}}
+    gpu-id = {{index .Values.configs "ppl_analytics_config.txt" "secondary-gie0" "gpu-id"}}
+    gie-unique-id = {{index .Values.configs "ppl_analytics_config.txt" "secondary-gie0" "gie-unique-id"}}
+    operate-on-gie-id = {{index .Values.configs "ppl_analytics_config.txt" "secondary-gie0" "operate-on-gie-id"}}
+    operate-on-class-ids = {{index .Values.configs "ppl_analytics_config.txt" "secondary-gie0" "operate-on-class-ids"}}
+    batch-size = {{index .Values.configs "ppl_analytics_config.txt" "secondary-gie0" "batch-size"}}
+    config-file = {{index .Values.configs "ppl_analytics_config.txt" "secondary-gie0" "config-file"}}
+
+    [tests]
+    file-loop = {{index .Values.configs "ppl_analytics_config.txt" "tests" "file-loop"}}
+
+
+  fsl_init_workload: |
+    {{- index .Values.configs "fsl_init_workload" | toYaml | nindent 4 }}
+  mtmc_sgie_config.txt: |
+    [property]
+    gpu-id = {{index .Values.configs "mtmc_sgie_config.txt" "property" "gpu-id"}}
+    net-scale-factor = {{index .Values.configs "mtmc_sgie_config.txt" "property" "net-scale-factor"}}
+    offsets = {{index .Values.configs "mtmc_sgie_config.txt" "property" "offsets"}}
+    model-engine-file = {{index .Values.configs "mtmc_sgie_config.txt" "property" "model-engine-file"}}
+    onnx-file = {{index .Values.configs "mtmc_sgie_config.txt" "property" "onnx-file"}}
+    infer-dims = {{index .Values.configs "mtmc_sgie_config.txt" "property" "infer-dims"}}
+    batch-size = {{index .Values.configs "mtmc_sgie_config.txt" "property" "batch-size"}}
+    network-mode = {{index .Values.configs "mtmc_sgie_config.txt" "property" "network-mode"}}
+    network-type = {{index .Values.configs "mtmc_sgie_config.txt" "property" "network-type"}}
+    interval = {{index .Values.configs "mtmc_sgie_config.txt" "property" "interval"}}
+    process-mode = {{index .Values.configs "mtmc_sgie_config.txt" "property" "process-mode"}}
+    gie-unique-id = {{index .Values.configs "mtmc_sgie_config.txt" "property" "gie-unique-id"}}
+    classifier-threshold = {{index .Values.configs "mtmc_sgie_config.txt" "property" "classifier-threshold"}}
+    operate-on-gie-id = {{index .Values.configs "mtmc_sgie_config.txt" "property" "operate-on-gie-id"}}
+    output-tensor-meta = {{index .Values.configs "mtmc_sgie_config.txt" "property" "output-tensor-meta"}}
+    model-color-format = {{index .Values.configs "mtmc_sgie_config.txt" "property" "model-color-format"}}
+    maintain-aspect-ratio = {{index .Values.configs "mtmc_sgie_config.txt" "property" "maintain-aspect-ratio"}}
+    operate-on-class-ids = {{index .Values.configs "mtmc_sgie_config.txt" "property" "operate-on-class-ids"}}
+
+
+  fsl_msgconv_config.properties: |
+    [sensorTemplate]
+    enable = {{index .Values.configs "fsl_msgconv_config.properties" "sensorTemplate" "enable"}}
+    type = {{index .Values.configs "fsl_msgconv_config.properties" "sensorTemplate" "type"}}
+    id = {{index .Values.configs "fsl_msgconv_config.properties" "sensorTemplate" "id"}}
+    location = {{index .Values.configs "fsl_msgconv_config.properties" "sensorTemplate" "location"}}
+    description = {{index .Values.configs "fsl_msgconv_config.properties" "sensorTemplate" "description"}}
+    coordinate = {{index .Values.configs "fsl_msgconv_config.properties" "sensorTemplate" "coordinate"}}
+
+    [placeTemplate]
+    enable = {{index .Values.configs "fsl_msgconv_config.properties" "placeTemplate" "enable"}}
+    id = {{index .Values.configs "fsl_msgconv_config.properties" "placeTemplate" "id"}}
+    type = {{index .Values.configs "fsl_msgconv_config.properties" "placeTemplate" "type"}}
+    name = {{index .Values.configs "fsl_msgconv_config.properties" "placeTemplate" "name"}}
+    location = {{index .Values.configs "fsl_msgconv_config.properties" "placeTemplate" "location"}}
+    coordinate = {{index .Values.configs "fsl_msgconv_config.properties" "placeTemplate" "coordinate"}}
+    place-sub-field1 = {{index .Values.configs "fsl_msgconv_config.properties" "placeTemplate" "place-sub-field1"}}
+    place-sub-field2 = {{index .Values.configs "fsl_msgconv_config.properties" "placeTemplate" "place-sub-field2"}}
+    place-sub-field3 = {{index .Values.configs "fsl_msgconv_config.properties" "placeTemplate" "place-sub-field3"}}
+
+    [analyticsTemplate]
+    enable = {{index .Values.configs "fsl_msgconv_config.properties" "analyticsTemplate" "enable"}}
+    id = {{index .Values.configs "fsl_msgconv_config.properties" "analyticsTemplate" "id"}}
+    description = {{index .Values.configs "fsl_msgconv_config.properties" "analyticsTemplate" "description"}}
+    source = {{index .Values.configs "fsl_msgconv_config.properties" "analyticsTemplate" "source"}}
+    version = {{index .Values.configs "fsl_msgconv_config.properties" "analyticsTemplate" "version"}}
+
+
+  mtmc_config_ddetr.txt: |
+    [application]
+    enable-perf-measurement = {{index .Values.configs "mtmc_config_ddetr.txt" "application" "enable-perf-measurement"}}
+    perf-measurement-interval-sec = {{index .Values.configs "mtmc_config_ddetr.txt" "application" "perf-measurement-interval-sec"}}
+
+    [tiled-display]
+    enable = {{index .Values.configs "mtmc_config_ddetr.txt" "tiled-display" "enable"}}
+    rows = {{index .Values.configs "mtmc_config_ddetr.txt" "tiled-display" "rows"}}
+    columns = {{index .Values.configs "mtmc_config_ddetr.txt" "tiled-display" "columns"}}
+    width = {{index .Values.configs "mtmc_config_ddetr.txt" "tiled-display" "width"}}
+    height = {{index .Values.configs "mtmc_config_ddetr.txt" "tiled-display" "height"}}
+    gpu-id = {{index .Values.configs "mtmc_config_ddetr.txt" "tiled-display" "gpu-id"}}
+    nvbuf-memory-type = {{index .Values.configs "mtmc_config_ddetr.txt" "tiled-display" "nvbuf-memory-type"}}
+
+    [source-list]
+    num-source-bins = {{index .Values.configs "mtmc_config_ddetr.txt" "source-list" "num-source-bins"}}
+    list = {{index .Values.configs "mtmc_config_ddetr.txt" "source-list" "list"}}
+    use-nvmultiurisrcbin = {{index .Values.configs "mtmc_config_ddetr.txt" "source-list" "use-nvmultiurisrcbin"}}
+    max-batch-size = {{index .Values.configs "mtmc_config_ddetr.txt" "source-list" "max-batch-size"}}
+    http-ip = {{index .Values.configs "mtmc_config_ddetr.txt" "source-list" "http-ip"}}
+    http-port = {{index .Values.configs "mtmc_config_ddetr.txt" "source-list" "http-port"}}
+    sgie-batch-size = {{index .Values.configs "mtmc_config_ddetr.txt" "source-list" "sgie-batch-size"}}
+
+    [source-attr-all]
+    enable = {{index .Values.configs "mtmc_config_ddetr.txt" "source-attr-all" "enable"}}
+    type = {{index .Values.configs "mtmc_config_ddetr.txt" "source-attr-all" "type"}}
+    num-sources = {{index .Values.configs "mtmc_config_ddetr.txt" "source-attr-all" "num-sources"}}
+    gpu-id = {{index .Values.configs "mtmc_config_ddetr.txt" "source-attr-all" "gpu-id"}}
+    cudadec-memtype = {{index .Values.configs "mtmc_config_ddetr.txt" "source-attr-all" "cudadec-memtype"}}
+    latency = {{index .Values.configs "mtmc_config_ddetr.txt" "source-attr-all" "latency"}}
+    rtsp-reconnect-interval-sec = {{index .Values.configs "mtmc_config_ddetr.txt" "source-attr-all" "rtsp-reconnect-interval-sec"}}
+
+    [sink0]
+    enable = {{index .Values.configs "mtmc_config_ddetr.txt" "sink0" "enable"}}
+    type = {{index .Values.configs "mtmc_config_ddetr.txt" "sink0" "type"}}
+    sync = {{index .Values.configs "mtmc_config_ddetr.txt" "sink0" "sync"}}
+    source-id = {{index .Values.configs "mtmc_config_ddetr.txt" "sink0" "source-id"}}
+    gpu-id = {{index .Values.configs "mtmc_config_ddetr.txt" "sink0" "gpu-id"}}
+    nvbuf-memory-type = {{index .Values.configs "mtmc_config_ddetr.txt" "sink0" "nvbuf-memory-type"}}
+
+    [sink1]
+    enable = {{index .Values.configs "mtmc_config_ddetr.txt" "sink1" "enable"}}
+    type = {{index .Values.configs "mtmc_config_ddetr.txt" "sink1" "type"}}
+    msg-conv-config = {{index .Values.configs "mtmc_config_ddetr.txt" "sink1" "msg-conv-config"}}
+    msg-conv-payload-type = {{index .Values.configs "mtmc_config_ddetr.txt" "sink1" "msg-conv-payload-type"}}
+    msg-conv-msg2p-new-api = {{index .Values.configs "mtmc_config_ddetr.txt" "sink1" "msg-conv-msg2p-new-api"}}
+    msg-conv-frame-interval = {{index .Values.configs "mtmc_config_ddetr.txt" "sink1" "msg-conv-frame-interval"}}
+    msg-broker-proto-lib = {{index .Values.configs "mtmc_config_ddetr.txt" "sink1" "msg-broker-proto-lib"}}
+    msg-broker-conn-str = {{index .Values.configs "mtmc_config_ddetr.txt" "sink1" "msg-broker-conn-str"}}
+    topic = {{index .Values.configs "mtmc_config_ddetr.txt" "sink1" "topic"}}
+
+    [sink2]
+    enable = {{index .Values.configs "mtmc_config_ddetr.txt" "sink2" "enable"}}
+    type = {{index .Values.configs "mtmc_config_ddetr.txt" "sink2" "type"}}
+    container = {{index .Values.configs "mtmc_config_ddetr.txt" "sink2" "container"}}
+    codec = {{index .Values.configs "mtmc_config_ddetr.txt" "sink2" "codec"}}
+    sync = {{index .Values.configs "mtmc_config_ddetr.txt" "sink2" "sync"}}
+    bitrate = {{index .Values.configs "mtmc_config_ddetr.txt" "sink2" "bitrate"}}
+    output-file = {{index .Values.configs "mtmc_config_ddetr.txt" "sink2" "output-file"}}
+    source-id = {{index .Values.configs "mtmc_config_ddetr.txt" "sink2" "source-id"}}
+
+    [message-converter]
+    enable = {{index .Values.configs "mtmc_config_ddetr.txt" "message-converter" "enable"}}
+    msg-conv-config = {{index .Values.configs "mtmc_config_ddetr.txt" "message-converter" "msg-conv-config"}}
+    msg-conv-payload-type = {{index .Values.configs "mtmc_config_ddetr.txt" "message-converter" "msg-conv-payload-type"}}
+
+    [message-consumer0]
+    enable = {{index .Values.configs "mtmc_config_ddetr.txt" "message-consumer0" "enable"}}
+    proto-lib = {{index .Values.configs "mtmc_config_ddetr.txt" "message-consumer0" "proto-lib"}}
+    conn-str = {{index .Values.configs "mtmc_config_ddetr.txt" "message-consumer0" "conn-str"}}
+    config-file = {{index .Values.configs "mtmc_config_ddetr.txt" "message-consumer0" "config-file"}}
+    subscribe-topic-list = {{index .Values.configs "mtmc_config_ddetr.txt" "message-consumer0" "subscribe-topic-list"}}
+
+    [osd]
+    enable = {{index .Values.configs "mtmc_config_ddetr.txt" "osd" "enable"}}
+    gpu-id = {{index .Values.configs "mtmc_config_ddetr.txt" "osd" "gpu-id"}}
+    border-width = {{index .Values.configs "mtmc_config_ddetr.txt" "osd" "border-width"}}
+    text-size = {{index .Values.configs "mtmc_config_ddetr.txt" "osd" "text-size"}}
+    text-color = {{index .Values.configs "mtmc_config_ddetr.txt" "osd" "text-color"}}
+    text-bg-color = {{index .Values.configs "mtmc_config_ddetr.txt" "osd" "text-bg-color"}}
+    font = {{index .Values.configs "mtmc_config_ddetr.txt" "osd" "font"}}
+    show-clock = {{index .Values.configs "mtmc_config_ddetr.txt" "osd" "show-clock"}}
+    clock-x-offset = {{index .Values.configs "mtmc_config_ddetr.txt" "osd" "clock-x-offset"}}
+    clock-y-offset = {{index .Values.configs "mtmc_config_ddetr.txt" "osd" "clock-y-offset"}}
+    clock-text-size = {{index .Values.configs "mtmc_config_ddetr.txt" "osd" "clock-text-size"}}
+    clock-color = {{index .Values.configs "mtmc_config_ddetr.txt" "osd" "clock-color"}}
+    nvbuf-memory-type = {{index .Values.configs "mtmc_config_ddetr.txt" "osd" "nvbuf-memory-type"}}
+
+    [streammux]
+    gpu-id = {{index .Values.configs "mtmc_config_ddetr.txt" "streammux" "gpu-id"}}
+    live-source = {{index .Values.configs "mtmc_config_ddetr.txt" "streammux" "live-source"}}
+    batch-size = {{index .Values.configs "mtmc_config_ddetr.txt" "streammux" "batch-size"}}
+    batched-push-timeout = {{index .Values.configs "mtmc_config_ddetr.txt" "streammux" "batched-push-timeout"}}
+    width = {{index .Values.configs "mtmc_config_ddetr.txt" "streammux" "width"}}
+    height = {{index .Values.configs "mtmc_config_ddetr.txt" "streammux" "height"}}
+    enable-padding = {{index .Values.configs "mtmc_config_ddetr.txt" "streammux" "enable-padding"}}
+    nvbuf-memory-type = {{index .Values.configs "mtmc_config_ddetr.txt" "streammux" "nvbuf-memory-type"}}
+    attach-sys-ts-as-ntp = {{index .Values.configs "mtmc_config_ddetr.txt" "streammux" "attach-sys-ts-as-ntp"}}
+    drop-pipeline-eos = {{index .Values.configs "mtmc_config_ddetr.txt" "streammux" "drop-pipeline-eos"}}
+
+    [primary-gie]
+    enable = {{index .Values.configs "mtmc_config_ddetr.txt" "primary-gie" "enable"}}
+    gpu-id = {{index .Values.configs "mtmc_config_ddetr.txt" "primary-gie" "gpu-id"}}
+    batch-size = {{index .Values.configs "mtmc_config_ddetr.txt" "primary-gie" "batch-size"}}
+    bbox-border-color0 = {{index .Values.configs "mtmc_config_ddetr.txt" "primary-gie" "bbox-border-color0"}}
+    bbox-border-color1 = {{index .Values.configs "mtmc_config_ddetr.txt" "primary-gie" "bbox-border-color1"}}
+    bbox-border-color2 = {{index .Values.configs "mtmc_config_ddetr.txt" "primary-gie" "bbox-border-color2"}}
+    bbox-border-color3 = {{index .Values.configs "mtmc_config_ddetr.txt" "primary-gie" "bbox-border-color3"}}
+    interval = {{index .Values.configs "mtmc_config_ddetr.txt" "primary-gie" "interval"}}
+    gie-unique-id = {{index .Values.configs "mtmc_config_ddetr.txt" "primary-gie" "gie-unique-id"}}
+    nvbuf-memory-type = {{index .Values.configs "mtmc_config_ddetr.txt" "primary-gie" "nvbuf-memory-type"}}
+    config-file = {{index .Values.configs "mtmc_config_ddetr.txt" "primary-gie" "config-file"}}
+
+    [tracker]
+    enable = {{index .Values.configs "mtmc_config_ddetr.txt" "tracker" "enable"}}
+    tracker-width = {{index .Values.configs "mtmc_config_ddetr.txt" "tracker" "tracker-width"}}
+    tracker-height = {{index .Values.configs "mtmc_config_ddetr.txt" "tracker" "tracker-height"}}
+    ll-lib-file = {{index .Values.configs "mtmc_config_ddetr.txt" "tracker" "ll-lib-file"}}
+    ll-config-file = {{index .Values.configs "mtmc_config_ddetr.txt" "tracker" "ll-config-file"}}
+    gpu-id = {{index .Values.configs "mtmc_config_ddetr.txt" "tracker" "gpu-id"}}
+    enable-batch-process = {{index .Values.configs "mtmc_config_ddetr.txt" "tracker" "enable-batch-process"}}
+    enable-past-frame = {{index .Values.configs "mtmc_config_ddetr.txt" "tracker" "enable-past-frame"}}
+    display-tracking-id = {{index .Values.configs "mtmc_config_ddetr.txt" "tracker" "display-tracking-id"}}
+
+    [secondary-gie0]
+    enable = {{index .Values.configs "mtmc_config_ddetr.txt" "secondary-gie0" "enable"}}
+    gpu-id = {{index .Values.configs "mtmc_config_ddetr.txt" "secondary-gie0" "gpu-id"}}
+    gie-unique-id = {{index .Values.configs "mtmc_config_ddetr.txt" "secondary-gie0" "gie-unique-id"}}
+    operate-on-gie-id = {{index .Values.configs "mtmc_config_ddetr.txt" "secondary-gie0" "operate-on-gie-id"}}
+    operate-on-class-ids = {{index .Values.configs "mtmc_config_ddetr.txt" "secondary-gie0" "operate-on-class-ids"}}
+    batch-size = {{index .Values.configs "mtmc_config_ddetr.txt" "secondary-gie0" "batch-size"}}
+    config-file = {{index .Values.configs "mtmc_config_ddetr.txt" "secondary-gie0" "config-file"}}
+
+    [tests]
+    file-loop = {{index .Values.configs "mtmc_config_ddetr.txt" "tests" "file-loop"}}
+
+
+  mtmc_pgie_config_ddetr.txt: |
+    [property]
+    gpu-id = {{index .Values.configs "mtmc_pgie_config_ddetr.txt" "property" "gpu-id"}}
+    offsets = {{index .Values.configs "mtmc_pgie_config_ddetr.txt" "property" "offsets"}}
+    net-scale-factor = {{index .Values.configs "mtmc_pgie_config_ddetr.txt" "property" "net-scale-factor"}}
+    infer-dims = {{index .Values.configs "mtmc_pgie_config_ddetr.txt" "property" "infer-dims"}}
+    uff-input-blob-name = {{index .Values.configs "mtmc_pgie_config_ddetr.txt" "property" "uff-input-blob-name"}}
+    network-mode = {{index .Values.configs "mtmc_pgie_config_ddetr.txt" "property" "network-mode"}}
+    num-detected-classes = {{index .Values.configs "mtmc_pgie_config_ddetr.txt" "property" "num-detected-classes"}}
+    interval = {{index .Values.configs "mtmc_pgie_config_ddetr.txt" "property" "interval"}}
+    gie-unique-id = {{index .Values.configs "mtmc_pgie_config_ddetr.txt" "property" "gie-unique-id"}}
+    cluster-mode = {{index .Values.configs "mtmc_pgie_config_ddetr.txt" "property" "cluster-mode"}}
+    maintain-aspect-ratio = {{index .Values.configs "mtmc_pgie_config_ddetr.txt" "property" "maintain-aspect-ratio"}}
+    model-engine-file = {{index .Values.configs "mtmc_pgie_config_ddetr.txt" "property" "model-engine-file"}}
+    tlt-encoded-model = {{index .Values.configs "mtmc_pgie_config_ddetr.txt" "property" "tlt-encoded-model"}}
+    tlt-model-key = {{index .Values.configs "mtmc_pgie_config_ddetr.txt" "property" "tlt-model-key"}}
+    labelfile-path = {{index .Values.configs "mtmc_pgie_config_ddetr.txt" "property" "labelfile-path"}}
+    output-blob-names = {{index .Values.configs "mtmc_pgie_config_ddetr.txt" "property" "output-blob-names"}}
+    parse-bbox-func-name = {{index .Values.configs "mtmc_pgie_config_ddetr.txt" "property" "parse-bbox-func-name"}}
+    custom-lib-path = {{index .Values.configs "mtmc_pgie_config_ddetr.txt" "property" "custom-lib-path"}}
+
+    [class-attrs-all]
+    pre-cluster-threshold = {{index .Values.configs "mtmc_pgie_config_ddetr.txt" "class-attrs-all" "pre-cluster-threshold"}}
+    nms-iou-threshold = {{index .Values.configs "mtmc_pgie_config_ddetr.txt" "class-attrs-all" "nms-iou-threshold"}}
+
+
+  fsl_pgie_config.txt: |
+    [property]
+    gpu-id = {{index .Values.configs "fsl_pgie_config.txt" "property" "gpu-id"}}
+    net-scale-factor = {{index .Values.configs "fsl_pgie_config.txt" "property" "net-scale-factor"}}
+    offsets = {{index .Values.configs "fsl_pgie_config.txt" "property" "offsets"}}
+    model-color-format = {{index .Values.configs "fsl_pgie_config.txt" "property" "model-color-format"}}
+    tlt-encoded-model = {{index .Values.configs "fsl_pgie_config.txt" "property" "tlt-encoded-model"}}
+    model-engine-file = {{index .Values.configs "fsl_pgie_config.txt" "property" "model-engine-file"}}
+    labelfile-path = {{index .Values.configs "fsl_pgie_config.txt" "property" "labelfile-path"}}
+    network-input-order = {{index .Values.configs "fsl_pgie_config.txt" "property" "network-input-order"}}
+    tlt-model-key = {{index .Values.configs "fsl_pgie_config.txt" "property" "tlt-model-key"}}
+    infer-dims = {{index .Values.configs "fsl_pgie_config.txt" "property" "infer-dims"}}
+    maintain-aspect-ratio = {{index .Values.configs "fsl_pgie_config.txt" "property" "maintain-aspect-ratio"}}
+    uff-input-blob-name = {{index .Values.configs "fsl_pgie_config.txt" "property" "uff-input-blob-name"}}
+    batch-size = {{index .Values.configs "fsl_pgie_config.txt" "property" "batch-size"}}
+    network-mode = {{index .Values.configs "fsl_pgie_config.txt" "property" "network-mode"}}
+    num-detected-classes = {{index .Values.configs "fsl_pgie_config.txt" "property" "num-detected-classes"}}
+    interval = {{index .Values.configs "fsl_pgie_config.txt" "property" "interval"}}
+    gie-unique-id = {{index .Values.configs "fsl_pgie_config.txt" "property" "gie-unique-id"}}
+    cluster-mode = {{index .Values.configs "fsl_pgie_config.txt" "property" "cluster-mode"}}
+    output-blob-names = {{index .Values.configs "fsl_pgie_config.txt" "property" "output-blob-names"}}
+    parse-bbox-func-name = {{index .Values.configs "fsl_pgie_config.txt" "property" "parse-bbox-func-name"}}
+    custom-lib-path = {{index .Values.configs "fsl_pgie_config.txt" "property" "custom-lib-path"}}
+
+    [class-attrs-all]
+    threshold = {{index .Values.configs "fsl_pgie_config.txt" "class-attrs-all" "threshold"}}
+    pre-cluster-threshold = {{index .Values.configs "fsl_pgie_config.txt" "class-attrs-all" "pre-cluster-threshold"}}
+    roi-top-offset = {{index .Values.configs "fsl_pgie_config.txt" "class-attrs-all" "roi-top-offset"}}
+    roi-bottom-offset = {{index .Values.configs "fsl_pgie_config.txt" "class-attrs-all" "roi-bottom-offset"}}
+    detected-min-w = {{index .Values.configs "fsl_pgie_config.txt" "class-attrs-all" "detected-min-w"}}
+    detected-min-h = {{index .Values.configs "fsl_pgie_config.txt" "class-attrs-all" "detected-min-h"}}
+    detected-max-w = {{index .Values.configs "fsl_pgie_config.txt" "class-attrs-all" "detected-max-w"}}
+    detected-max-h = {{index .Values.configs "fsl_pgie_config.txt" "class-attrs-all" "detected-max-h"}}
+
+
+  template.properties: |
+    {{- index .Values.configs "template.properties" | toYaml | nindent 4 }}
+  mtmc_config_ddetr_init.txt: |
+    [application]
+    enable-perf-measurement = {{index .Values.configs "mtmc_config_ddetr_init.txt" "application" "enable-perf-measurement"}}
+    perf-measurement-interval-sec = {{index .Values.configs "mtmc_config_ddetr_init.txt" "application" "perf-measurement-interval-sec"}}
+
+    [tiled-display]
+    enable = {{index .Values.configs "mtmc_config_ddetr_init.txt" "tiled-display" "enable"}}
+    rows = {{index .Values.configs "mtmc_config_ddetr_init.txt" "tiled-display" "rows"}}
+    columns = {{index .Values.configs "mtmc_config_ddetr_init.txt" "tiled-display" "columns"}}
+    width = {{index .Values.configs "mtmc_config_ddetr_init.txt" "tiled-display" "width"}}
+    height = {{index .Values.configs "mtmc_config_ddetr_init.txt" "tiled-display" "height"}}
+    gpu-id = {{index .Values.configs "mtmc_config_ddetr_init.txt" "tiled-display" "gpu-id"}}
+    nvbuf-memory-type = {{index .Values.configs "mtmc_config_ddetr_init.txt" "tiled-display" "nvbuf-memory-type"}}
+
+    [source-list]
+    num-source-bins = {{index .Values.configs "mtmc_config_ddetr_init.txt" "source-list" "num-source-bins"}}
+    list = {{index .Values.configs "mtmc_config_ddetr_init.txt" "source-list" "list"}}
+    use-nvmultiurisrcbin = {{index .Values.configs "mtmc_config_ddetr_init.txt" "source-list" "use-nvmultiurisrcbin"}}
+    max-batch-size = {{index .Values.configs "mtmc_config_ddetr_init.txt" "source-list" "max-batch-size"}}
+    http-ip = {{index .Values.configs "mtmc_config_ddetr_init.txt" "source-list" "http-ip"}}
+    http-port = {{index .Values.configs "mtmc_config_ddetr_init.txt" "source-list" "http-port"}}
+    sgie-batch-size = {{index .Values.configs "mtmc_config_ddetr_init.txt" "source-list" "sgie-batch-size"}}
+
+    [source-attr-all]
+    enable = {{index .Values.configs "mtmc_config_ddetr_init.txt" "source-attr-all" "enable"}}
+    type = {{index .Values.configs "mtmc_config_ddetr_init.txt" "source-attr-all" "type"}}
+    num-sources = {{index .Values.configs "mtmc_config_ddetr_init.txt" "source-attr-all" "num-sources"}}
+    gpu-id = {{index .Values.configs "mtmc_config_ddetr_init.txt" "source-attr-all" "gpu-id"}}
+    cudadec-memtype = {{index .Values.configs "mtmc_config_ddetr_init.txt" "source-attr-all" "cudadec-memtype"}}
+    latency = {{index .Values.configs "mtmc_config_ddetr_init.txt" "source-attr-all" "latency"}}
+    rtsp-reconnect-interval-sec = {{index .Values.configs "mtmc_config_ddetr_init.txt" "source-attr-all" "rtsp-reconnect-interval-sec"}}
+
+    [sink0]
+    enable = {{index .Values.configs "mtmc_config_ddetr_init.txt" "sink0" "enable"}}
+    type = {{index .Values.configs "mtmc_config_ddetr_init.txt" "sink0" "type"}}
+    sync = {{index .Values.configs "mtmc_config_ddetr_init.txt" "sink0" "sync"}}
+    source-id = {{index .Values.configs "mtmc_config_ddetr_init.txt" "sink0" "source-id"}}
+    gpu-id = {{index .Values.configs "mtmc_config_ddetr_init.txt" "sink0" "gpu-id"}}
+    nvbuf-memory-type = {{index .Values.configs "mtmc_config_ddetr_init.txt" "sink0" "nvbuf-memory-type"}}
+
+    [sink1]
+    enable = {{index .Values.configs "mtmc_config_ddetr_init.txt" "sink1" "enable"}}
+    type = {{index .Values.configs "mtmc_config_ddetr_init.txt" "sink1" "type"}}
+    msg-conv-config = {{index .Values.configs "mtmc_config_ddetr_init.txt" "sink1" "msg-conv-config"}}
+    msg-conv-payload-type = {{index .Values.configs "mtmc_config_ddetr_init.txt" "sink1" "msg-conv-payload-type"}}
+    msg-conv-msg2p-new-api = {{index .Values.configs "mtmc_config_ddetr_init.txt" "sink1" "msg-conv-msg2p-new-api"}}
+    msg-conv-frame-interval = {{index .Values.configs "mtmc_config_ddetr_init.txt" "sink1" "msg-conv-frame-interval"}}
+    msg-broker-proto-lib = {{index .Values.configs "mtmc_config_ddetr_init.txt" "sink1" "msg-broker-proto-lib"}}
+    msg-broker-conn-str = {{index .Values.configs "mtmc_config_ddetr_init.txt" "sink1" "msg-broker-conn-str"}}
+    topic = {{index .Values.configs "mtmc_config_ddetr_init.txt" "sink1" "topic"}}
+
+    [sink2]
+    enable = {{index .Values.configs "mtmc_config_ddetr_init.txt" "sink2" "enable"}}
+    type = {{index .Values.configs "mtmc_config_ddetr_init.txt" "sink2" "type"}}
+    container = {{index .Values.configs "mtmc_config_ddetr_init.txt" "sink2" "container"}}
+    codec = {{index .Values.configs "mtmc_config_ddetr_init.txt" "sink2" "codec"}}
+    sync = {{index .Values.configs "mtmc_config_ddetr_init.txt" "sink2" "sync"}}
+    bitrate = {{index .Values.configs "mtmc_config_ddetr_init.txt" "sink2" "bitrate"}}
+    output-file = {{index .Values.configs "mtmc_config_ddetr_init.txt" "sink2" "output-file"}}
+    source-id = {{index .Values.configs "mtmc_config_ddetr_init.txt" "sink2" "source-id"}}
+
+    [message-converter]
+    enable = {{index .Values.configs "mtmc_config_ddetr_init.txt" "message-converter" "enable"}}
+    msg-conv-config = {{index .Values.configs "mtmc_config_ddetr_init.txt" "message-converter" "msg-conv-config"}}
+    msg-conv-payload-type = {{index .Values.configs "mtmc_config_ddetr_init.txt" "message-converter" "msg-conv-payload-type"}}
+
+    [message-consumer0]
+    enable = {{index .Values.configs "mtmc_config_ddetr_init.txt" "message-consumer0" "enable"}}
+    proto-lib = {{index .Values.configs "mtmc_config_ddetr_init.txt" "message-consumer0" "proto-lib"}}
+    conn-str = {{index .Values.configs "mtmc_config_ddetr_init.txt" "message-consumer0" "conn-str"}}
+    config-file = {{index .Values.configs "mtmc_config_ddetr_init.txt" "message-consumer0" "config-file"}}
+    subscribe-topic-list = {{index .Values.configs "mtmc_config_ddetr_init.txt" "message-consumer0" "subscribe-topic-list"}}
+
+    [osd]
+    enable = {{index .Values.configs "mtmc_config_ddetr_init.txt" "osd" "enable"}}
+    gpu-id = {{index .Values.configs "mtmc_config_ddetr_init.txt" "osd" "gpu-id"}}
+    border-width = {{index .Values.configs "mtmc_config_ddetr_init.txt" "osd" "border-width"}}
+    text-size = {{index .Values.configs "mtmc_config_ddetr_init.txt" "osd" "text-size"}}
+    text-color = {{index .Values.configs "mtmc_config_ddetr_init.txt" "osd" "text-color"}}
+    text-bg-color = {{index .Values.configs "mtmc_config_ddetr_init.txt" "osd" "text-bg-color"}}
+    font = {{index .Values.configs "mtmc_config_ddetr_init.txt" "osd" "font"}}
+    show-clock = {{index .Values.configs "mtmc_config_ddetr_init.txt" "osd" "show-clock"}}
+    clock-x-offset = {{index .Values.configs "mtmc_config_ddetr_init.txt" "osd" "clock-x-offset"}}
+    clock-y-offset = {{index .Values.configs "mtmc_config_ddetr_init.txt" "osd" "clock-y-offset"}}
+    clock-text-size = {{index .Values.configs "mtmc_config_ddetr_init.txt" "osd" "clock-text-size"}}
+    clock-color = {{index .Values.configs "mtmc_config_ddetr_init.txt" "osd" "clock-color"}}
+    nvbuf-memory-type = {{index .Values.configs "mtmc_config_ddetr_init.txt" "osd" "nvbuf-memory-type"}}
+
+    [streammux]
+    gpu-id = {{index .Values.configs "mtmc_config_ddetr_init.txt" "streammux" "gpu-id"}}
+    live-source = {{index .Values.configs "mtmc_config_ddetr_init.txt" "streammux" "live-source"}}
+    batch-size = {{index .Values.configs "mtmc_config_ddetr_init.txt" "streammux" "batch-size"}}
+    batched-push-timeout = {{index .Values.configs "mtmc_config_ddetr_init.txt" "streammux" "batched-push-timeout"}}
+    width = {{index .Values.configs "mtmc_config_ddetr_init.txt" "streammux" "width"}}
+    height = {{index .Values.configs "mtmc_config_ddetr_init.txt" "streammux" "height"}}
+    enable-padding = {{index .Values.configs "mtmc_config_ddetr_init.txt" "streammux" "enable-padding"}}
+    nvbuf-memory-type = {{index .Values.configs "mtmc_config_ddetr_init.txt" "streammux" "nvbuf-memory-type"}}
+    attach-sys-ts-as-ntp = {{index .Values.configs "mtmc_config_ddetr_init.txt" "streammux" "attach-sys-ts-as-ntp"}}
+    drop-pipeline-eos = {{index .Values.configs "mtmc_config_ddetr_init.txt" "streammux" "drop-pipeline-eos"}}
+
+    [primary-gie]
+    enable = {{index .Values.configs "mtmc_config_ddetr_init.txt" "primary-gie" "enable"}}
+    gpu-id = {{index .Values.configs "mtmc_config_ddetr_init.txt" "primary-gie" "gpu-id"}}
+    batch-size = {{index .Values.configs "mtmc_config_ddetr_init.txt" "primary-gie" "batch-size"}}
+    bbox-border-color0 = {{index .Values.configs "mtmc_config_ddetr_init.txt" "primary-gie" "bbox-border-color0"}}
+    bbox-border-color1 = {{index .Values.configs "mtmc_config_ddetr_init.txt" "primary-gie" "bbox-border-color1"}}
+    bbox-border-color2 = {{index .Values.configs "mtmc_config_ddetr_init.txt" "primary-gie" "bbox-border-color2"}}
+    bbox-border-color3 = {{index .Values.configs "mtmc_config_ddetr_init.txt" "primary-gie" "bbox-border-color3"}}
+    interval = {{index .Values.configs "mtmc_config_ddetr_init.txt" "primary-gie" "interval"}}
+    gie-unique-id = {{index .Values.configs "mtmc_config_ddetr_init.txt" "primary-gie" "gie-unique-id"}}
+    nvbuf-memory-type = {{index .Values.configs "mtmc_config_ddetr_init.txt" "primary-gie" "nvbuf-memory-type"}}
+    config-file = {{index .Values.configs "mtmc_config_ddetr_init.txt" "primary-gie" "config-file"}}
+
+    [tracker]
+    enable = {{index .Values.configs "mtmc_config_ddetr_init.txt" "tracker" "enable"}}
+    tracker-width = {{index .Values.configs "mtmc_config_ddetr_init.txt" "tracker" "tracker-width"}}
+    tracker-height = {{index .Values.configs "mtmc_config_ddetr_init.txt" "tracker" "tracker-height"}}
+    ll-lib-file = {{index .Values.configs "mtmc_config_ddetr_init.txt" "tracker" "ll-lib-file"}}
+    ll-config-file = {{index .Values.configs "mtmc_config_ddetr_init.txt" "tracker" "ll-config-file"}}
+    gpu-id = {{index .Values.configs "mtmc_config_ddetr_init.txt" "tracker" "gpu-id"}}
+    enable-batch-process = {{index .Values.configs "mtmc_config_ddetr_init.txt" "tracker" "enable-batch-process"}}
+    enable-past-frame = {{index .Values.configs "mtmc_config_ddetr_init.txt" "tracker" "enable-past-frame"}}
+    display-tracking-id = {{index .Values.configs "mtmc_config_ddetr_init.txt" "tracker" "display-tracking-id"}}
+
+    [secondary-gie0]
+    enable = {{index .Values.configs "mtmc_config_ddetr_init.txt" "secondary-gie0" "enable"}}
+    gpu-id = {{index .Values.configs "mtmc_config_ddetr_init.txt" "secondary-gie0" "gpu-id"}}
+    gie-unique-id = {{index .Values.configs "mtmc_config_ddetr_init.txt" "secondary-gie0" "gie-unique-id"}}
+    operate-on-gie-id = {{index .Values.configs "mtmc_config_ddetr_init.txt" "secondary-gie0" "operate-on-gie-id"}}
+    operate-on-class-ids = {{index .Values.configs "mtmc_config_ddetr_init.txt" "secondary-gie0" "operate-on-class-ids"}}
+    batch-size = {{index .Values.configs "mtmc_config_ddetr_init.txt" "secondary-gie0" "batch-size"}}
+    config-file = {{index .Values.configs "mtmc_config_ddetr_init.txt" "secondary-gie0" "config-file"}}
+
+    [tests]
+    file-loop = {{index .Values.configs "mtmc_config_ddetr_init.txt" "tests" "file-loop"}}
+
+
+  fsl_sgie_config.txt: |
+    [property]
+    gpu-id = {{index .Values.configs "fsl_sgie_config.txt" "property" "gpu-id"}}
+    net-scale-factor = {{index .Values.configs "fsl_sgie_config.txt" "property" "net-scale-factor"}}
+    offsets = {{index .Values.configs "fsl_sgie_config.txt" "property" "offsets"}}
+    tlt-encoded-model = {{index .Values.configs "fsl_sgie_config.txt" "property" "tlt-encoded-model"}}
+    model-engine-file = {{index .Values.configs "fsl_sgie_config.txt" "property" "model-engine-file"}}
+    tlt-model-key = {{index .Values.configs "fsl_sgie_config.txt" "property" "tlt-model-key"}}
+    infer-dims = {{index .Values.configs "fsl_sgie_config.txt" "property" "infer-dims"}}
+    batch-size = {{index .Values.configs "fsl_sgie_config.txt" "property" "batch-size"}}
+    network-mode = {{index .Values.configs "fsl_sgie_config.txt" "property" "network-mode"}}
+    network-type = {{index .Values.configs "fsl_sgie_config.txt" "property" "network-type"}}
+    interval = {{index .Values.configs "fsl_sgie_config.txt" "property" "interval"}}
+    process-mode = {{index .Values.configs "fsl_sgie_config.txt" "property" "process-mode"}}
+    gie-unique-id = {{index .Values.configs "fsl_sgie_config.txt" "property" "gie-unique-id"}}
+    classifier-threshold = {{index .Values.configs "fsl_sgie_config.txt" "property" "classifier-threshold"}}
+    operate-on-gie-id = {{index .Values.configs "fsl_sgie_config.txt" "property" "operate-on-gie-id"}}
+    output-tensor-meta = {{index .Values.configs "fsl_sgie_config.txt" "property" "output-tensor-meta"}}
+    model-color-format = {{index .Values.configs "fsl_sgie_config.txt" "property" "model-color-format"}}
+    maintain-aspect-ratio = {{index .Values.configs "fsl_sgie_config.txt" "property" "maintain-aspect-ratio"}}
+    operate-on-class-ids = {{index .Values.configs "fsl_sgie_config.txt" "property" "operate-on-class-ids"}}
+
+
+  mtmc_config_ddetr.properties: |
+    [application]
+    enable-perf-measurement = {{index .Values.configs "mtmc_config_ddetr.properties" "application" "enable-perf-measurement"}}
+    perf-measurement-interval-sec = {{index .Values.configs "mtmc_config_ddetr.properties" "application" "perf-measurement-interval-sec"}}
+
+    [tiled-display]
+    enable = {{index .Values.configs "mtmc_config_ddetr.properties" "tiled-display" "enable"}}
+    rows = {{index .Values.configs "mtmc_config_ddetr.properties" "tiled-display" "rows"}}
+    columns = {{index .Values.configs "mtmc_config_ddetr.properties" "tiled-display" "columns"}}
+    width = {{index .Values.configs "mtmc_config_ddetr.properties" "tiled-display" "width"}}
+    height = {{index .Values.configs "mtmc_config_ddetr.properties" "tiled-display" "height"}}
+    gpu-id = {{index .Values.configs "mtmc_config_ddetr.properties" "tiled-display" "gpu-id"}}
+    nvbuf-memory-type = {{index .Values.configs "mtmc_config_ddetr.properties" "tiled-display" "nvbuf-memory-type"}}
+
+    [sourceTemplate]
+    enable = {{index .Values.configs "mtmc_config_ddetr.properties" "sourceTemplate" "enable"}}
+    type = {{index .Values.configs "mtmc_config_ddetr.properties" "sourceTemplate" "type"}}
+    uri = {{index .Values.configs "mtmc_config_ddetr.properties" "sourceTemplate" "uri"}}
+    num-sources = {{index .Values.configs "mtmc_config_ddetr.properties" "sourceTemplate" "num-sources"}}
+    gpu-id = {{index .Values.configs "mtmc_config_ddetr.properties" "sourceTemplate" "gpu-id"}}
+    nvbuf-memory-type = {{index .Values.configs "mtmc_config_ddetr.properties" "sourceTemplate" "nvbuf-memory-type"}}
+    latency = {{index .Values.configs "mtmc_config_ddetr.properties" "sourceTemplate" "latency"}}
+    rtsp-reconnect-interval-sec = {{index .Values.configs "mtmc_config_ddetr.properties" "sourceTemplate" "rtsp-reconnect-interval-sec"}}
+    select-rtp-protocol = {{index .Values.configs "mtmc_config_ddetr.properties" "sourceTemplate" "select-rtp-protocol"}}
+
+    [sink0]
+    enable = {{index .Values.configs "mtmc_config_ddetr.properties" "sink0" "enable"}}
+    type = {{index .Values.configs "mtmc_config_ddetr.properties" "sink0" "type"}}
+    sync = {{index .Values.configs "mtmc_config_ddetr.properties" "sink0" "sync"}}
+    source-id = {{index .Values.configs "mtmc_config_ddetr.properties" "sink0" "source-id"}}
+    gpu-id = {{index .Values.configs "mtmc_config_ddetr.properties" "sink0" "gpu-id"}}
+    nvbuf-memory-type = {{index .Values.configs "mtmc_config_ddetr.properties" "sink0" "nvbuf-memory-type"}}
+
+    [sink1]
+    enable = {{index .Values.configs "mtmc_config_ddetr.properties" "sink1" "enable"}}
+    type = {{index .Values.configs "mtmc_config_ddetr.properties" "sink1" "type"}}
+    msg-conv-config = {{index .Values.configs "mtmc_config_ddetr.properties" "sink1" "msg-conv-config"}}
+    msg-conv-payload-type = {{index .Values.configs "mtmc_config_ddetr.properties" "sink1" "msg-conv-payload-type"}}
+    msg-conv-msg2p-new-api = {{index .Values.configs "mtmc_config_ddetr.properties" "sink1" "msg-conv-msg2p-new-api"}}
+    msg-conv-frame-interval = {{index .Values.configs "mtmc_config_ddetr.properties" "sink1" "msg-conv-frame-interval"}}
+    msg-broker-proto-lib = {{index .Values.configs "mtmc_config_ddetr.properties" "sink1" "msg-broker-proto-lib"}}
+    msg-broker-conn-str = {{index .Values.configs "mtmc_config_ddetr.properties" "sink1" "msg-broker-conn-str"}}
+    topic = {{index .Values.configs "mtmc_config_ddetr.properties" "sink1" "topic"}}
+
+    [sink2]
+    enable = {{index .Values.configs "mtmc_config_ddetr.properties" "sink2" "enable"}}
+    type = {{index .Values.configs "mtmc_config_ddetr.properties" "sink2" "type"}}
+    container = {{index .Values.configs "mtmc_config_ddetr.properties" "sink2" "container"}}
+    codec = {{index .Values.configs "mtmc_config_ddetr.properties" "sink2" "codec"}}
+    sync = {{index .Values.configs "mtmc_config_ddetr.properties" "sink2" "sync"}}
+    bitrate = {{index .Values.configs "mtmc_config_ddetr.properties" "sink2" "bitrate"}}
+    output-file = {{index .Values.configs "mtmc_config_ddetr.properties" "sink2" "output-file"}}
+    source-id = {{index .Values.configs "mtmc_config_ddetr.properties" "sink2" "source-id"}}
+
+    [message-converter]
+    enable = {{index .Values.configs "mtmc_config_ddetr.properties" "message-converter" "enable"}}
+    msg-conv-config = {{index .Values.configs "mtmc_config_ddetr.properties" "message-converter" "msg-conv-config"}}
+    msg-conv-payload-type = {{index .Values.configs "mtmc_config_ddetr.properties" "message-converter" "msg-conv-payload-type"}}
+
+    [message-consumer0]
+    enable = {{index .Values.configs "mtmc_config_ddetr.properties" "message-consumer0" "enable"}}
+    proto-lib = {{index .Values.configs "mtmc_config_ddetr.properties" "message-consumer0" "proto-lib"}}
+    conn-str = {{index .Values.configs "mtmc_config_ddetr.properties" "message-consumer0" "conn-str"}}
+    config-file = {{index .Values.configs "mtmc_config_ddetr.properties" "message-consumer0" "config-file"}}
+    subscribe-topic-list = {{index .Values.configs "mtmc_config_ddetr.properties" "message-consumer0" "subscribe-topic-list"}}
+
+    [osd]
+    enable = {{index .Values.configs "mtmc_config_ddetr.properties" "osd" "enable"}}
+    gpu-id = {{index .Values.configs "mtmc_config_ddetr.properties" "osd" "gpu-id"}}
+    border-width = {{index .Values.configs "mtmc_config_ddetr.properties" "osd" "border-width"}}
+    text-size = {{index .Values.configs "mtmc_config_ddetr.properties" "osd" "text-size"}}
+    text-color = {{index .Values.configs "mtmc_config_ddetr.properties" "osd" "text-color"}}
+    text-bg-color = {{index .Values.configs "mtmc_config_ddetr.properties" "osd" "text-bg-color"}}
+    font = {{index .Values.configs "mtmc_config_ddetr.properties" "osd" "font"}}
+    show-clock = {{index .Values.configs "mtmc_config_ddetr.properties" "osd" "show-clock"}}
+    clock-x-offset = {{index .Values.configs "mtmc_config_ddetr.properties" "osd" "clock-x-offset"}}
+    clock-y-offset = {{index .Values.configs "mtmc_config_ddetr.properties" "osd" "clock-y-offset"}}
+    clock-text-size = {{index .Values.configs "mtmc_config_ddetr.properties" "osd" "clock-text-size"}}
+    clock-color = {{index .Values.configs "mtmc_config_ddetr.properties" "osd" "clock-color"}}
+    nvbuf-memory-type = {{index .Values.configs "mtmc_config_ddetr.properties" "osd" "nvbuf-memory-type"}}
+
+    [streammux]
+    gpu-id = {{index .Values.configs "mtmc_config_ddetr.properties" "streammux" "gpu-id"}}
+    live-source = {{index .Values.configs "mtmc_config_ddetr.properties" "streammux" "live-source"}}
+    batch-size = {{index .Values.configs "mtmc_config_ddetr.properties" "streammux" "batch-size"}}
+    batched-push-timeout = {{index .Values.configs "mtmc_config_ddetr.properties" "streammux" "batched-push-timeout"}}
+    width = {{index .Values.configs "mtmc_config_ddetr.properties" "streammux" "width"}}
+    height = {{index .Values.configs "mtmc_config_ddetr.properties" "streammux" "height"}}
+    enable-padding = {{index .Values.configs "mtmc_config_ddetr.properties" "streammux" "enable-padding"}}
+    nvbuf-memory-type = {{index .Values.configs "mtmc_config_ddetr.properties" "streammux" "nvbuf-memory-type"}}
+    attach-sys-ts-as-ntp = {{index .Values.configs "mtmc_config_ddetr.properties" "streammux" "attach-sys-ts-as-ntp"}}
+
+    [primary-gie]
+    enable = {{index .Values.configs "mtmc_config_ddetr.properties" "primary-gie" "enable"}}
+    gpu-id = {{index .Values.configs "mtmc_config_ddetr.properties" "primary-gie" "gpu-id"}}
+    batch-size = {{index .Values.configs "mtmc_config_ddetr.properties" "primary-gie" "batch-size"}}
+    bbox-border-color0 = {{index .Values.configs "mtmc_config_ddetr.properties" "primary-gie" "bbox-border-color0"}}
+    bbox-border-color1 = {{index .Values.configs "mtmc_config_ddetr.properties" "primary-gie" "bbox-border-color1"}}
+    bbox-border-color2 = {{index .Values.configs "mtmc_config_ddetr.properties" "primary-gie" "bbox-border-color2"}}
+    bbox-border-color3 = {{index .Values.configs "mtmc_config_ddetr.properties" "primary-gie" "bbox-border-color3"}}
+    interval = {{index .Values.configs "mtmc_config_ddetr.properties" "primary-gie" "interval"}}
+    gie-unique-id = {{index .Values.configs "mtmc_config_ddetr.properties" "primary-gie" "gie-unique-id"}}
+    nvbuf-memory-type = {{index .Values.configs "mtmc_config_ddetr.properties" "primary-gie" "nvbuf-memory-type"}}
+    config-file = {{index .Values.configs "mtmc_config_ddetr.properties" "primary-gie" "config-file"}}
+
+    [tracker]
+    enable = {{index .Values.configs "mtmc_config_ddetr.properties" "tracker" "enable"}}
+    tracker-width = {{index .Values.configs "mtmc_config_ddetr.properties" "tracker" "tracker-width"}}
+    tracker-height = {{index .Values.configs "mtmc_config_ddetr.properties" "tracker" "tracker-height"}}
+    ll-lib-file = {{index .Values.configs "mtmc_config_ddetr.properties" "tracker" "ll-lib-file"}}
+    ll-config-file = {{index .Values.configs "mtmc_config_ddetr.properties" "tracker" "ll-config-file"}}
+    gpu-id = {{index .Values.configs "mtmc_config_ddetr.properties" "tracker" "gpu-id"}}
+    enable-batch-process = {{index .Values.configs "mtmc_config_ddetr.properties" "tracker" "enable-batch-process"}}
+    enable-past-frame = {{index .Values.configs "mtmc_config_ddetr.properties" "tracker" "enable-past-frame"}}
+    display-tracking-id = {{index .Values.configs "mtmc_config_ddetr.properties" "tracker" "display-tracking-id"}}
+
+    [secondary-gie0]
+    enable = {{index .Values.configs "mtmc_config_ddetr.properties" "secondary-gie0" "enable"}}
+    gpu-id = {{index .Values.configs "mtmc_config_ddetr.properties" "secondary-gie0" "gpu-id"}}
+    gie-unique-id = {{index .Values.configs "mtmc_config_ddetr.properties" "secondary-gie0" "gie-unique-id"}}
+    operate-on-gie-id = {{index .Values.configs "mtmc_config_ddetr.properties" "secondary-gie0" "operate-on-gie-id"}}
+    operate-on-class-ids = {{index .Values.configs "mtmc_config_ddetr.properties" "secondary-gie0" "operate-on-class-ids"}}
+    batch-size = {{index .Values.configs "mtmc_config_ddetr.properties" "secondary-gie0" "batch-size"}}
+    config-file = {{index .Values.configs "mtmc_config_ddetr.properties" "secondary-gie0" "config-file"}}
+
+    [tests]
+    file-loop = {{index .Values.configs "mtmc_config_ddetr.properties" "tests" "file-loop"}}
+
+
+  mtmc_config.properties: |
+    [application]
+    enable-perf-measurement = {{index .Values.configs "mtmc_config.properties" "application" "enable-perf-measurement"}}
+    perf-measurement-interval-sec = {{index .Values.configs "mtmc_config.properties" "application" "perf-measurement-interval-sec"}}
+
+    [tiled-display]
+    enable = {{index .Values.configs "mtmc_config.properties" "tiled-display" "enable"}}
+    rows = {{index .Values.configs "mtmc_config.properties" "tiled-display" "rows"}}
+    columns = {{index .Values.configs "mtmc_config.properties" "tiled-display" "columns"}}
+    width = {{index .Values.configs "mtmc_config.properties" "tiled-display" "width"}}
+    height = {{index .Values.configs "mtmc_config.properties" "tiled-display" "height"}}
+    gpu-id = {{index .Values.configs "mtmc_config.properties" "tiled-display" "gpu-id"}}
+    nvbuf-memory-type = {{index .Values.configs "mtmc_config.properties" "tiled-display" "nvbuf-memory-type"}}
+
+    [sourceTemplate]
+    enable = {{index .Values.configs "mtmc_config.properties" "sourceTemplate" "enable"}}
+    type = {{index .Values.configs "mtmc_config.properties" "sourceTemplate" "type"}}
+    uri = {{index .Values.configs "mtmc_config.properties" "sourceTemplate" "uri"}}
+    num-sources = {{index .Values.configs "mtmc_config.properties" "sourceTemplate" "num-sources"}}
+    gpu-id = {{index .Values.configs "mtmc_config.properties" "sourceTemplate" "gpu-id"}}
+    nvbuf-memory-type = {{index .Values.configs "mtmc_config.properties" "sourceTemplate" "nvbuf-memory-type"}}
+    latency = {{index .Values.configs "mtmc_config.properties" "sourceTemplate" "latency"}}
+    rtsp-reconnect-interval-sec = {{index .Values.configs "mtmc_config.properties" "sourceTemplate" "rtsp-reconnect-interval-sec"}}
+    select-rtp-protocol = {{index .Values.configs "mtmc_config.properties" "sourceTemplate" "select-rtp-protocol"}}
+
+    [source-attr-all]
+    enable = {{index .Values.configs "mtmc_config.properties" "source-attr-all" "enable"}}
+    type = {{index .Values.configs "mtmc_config.properties" "source-attr-all" "type"}}
+    num-sources = {{index .Values.configs "mtmc_config.properties" "source-attr-all" "num-sources"}}
+    gpu-id = {{index .Values.configs "mtmc_config.properties" "source-attr-all" "gpu-id"}}
+    cudadec-memtype = {{index .Values.configs "mtmc_config.properties" "source-attr-all" "cudadec-memtype"}}
+    latency = {{index .Values.configs "mtmc_config.properties" "source-attr-all" "latency"}}
+    rtsp-reconnect-interval-sec = {{index .Values.configs "mtmc_config.properties" "source-attr-all" "rtsp-reconnect-interval-sec"}}
+
+    [sink0]
+    enable = {{index .Values.configs "mtmc_config.properties" "sink0" "enable"}}
+    type = {{index .Values.configs "mtmc_config.properties" "sink0" "type"}}
+    sync = {{index .Values.configs "mtmc_config.properties" "sink0" "sync"}}
+    source-id = {{index .Values.configs "mtmc_config.properties" "sink0" "source-id"}}
+    gpu-id = {{index .Values.configs "mtmc_config.properties" "sink0" "gpu-id"}}
+    nvbuf-memory-type = {{index .Values.configs "mtmc_config.properties" "sink0" "nvbuf-memory-type"}}
+
+    [sink1]
+    enable = {{index .Values.configs "mtmc_config.properties" "sink1" "enable"}}
+    type = {{index .Values.configs "mtmc_config.properties" "sink1" "type"}}
+    msg-conv-config = {{index .Values.configs "mtmc_config.properties" "sink1" "msg-conv-config"}}
+    msg-conv-payload-type = {{index .Values.configs "mtmc_config.properties" "sink1" "msg-conv-payload-type"}}
+    msg-conv-msg2p-new-api = {{index .Values.configs "mtmc_config.properties" "sink1" "msg-conv-msg2p-new-api"}}
+    msg-conv-frame-interval = {{index .Values.configs "mtmc_config.properties" "sink1" "msg-conv-frame-interval"}}
+    msg-broker-proto-lib = {{index .Values.configs "mtmc_config.properties" "sink1" "msg-broker-proto-lib"}}
+    msg-broker-conn-str = {{index .Values.configs "mtmc_config.properties" "sink1" "msg-broker-conn-str"}}
+    topic = {{index .Values.configs "mtmc_config.properties" "sink1" "topic"}}
+
+    [sink2]
+    enable = {{index .Values.configs "mtmc_config.properties" "sink2" "enable"}}
+    type = {{index .Values.configs "mtmc_config.properties" "sink2" "type"}}
+    container = {{index .Values.configs "mtmc_config.properties" "sink2" "container"}}
+    codec = {{index .Values.configs "mtmc_config.properties" "sink2" "codec"}}
+    sync = {{index .Values.configs "mtmc_config.properties" "sink2" "sync"}}
+    bitrate = {{index .Values.configs "mtmc_config.properties" "sink2" "bitrate"}}
+    output-file = {{index .Values.configs "mtmc_config.properties" "sink2" "output-file"}}
+    source-id = {{index .Values.configs "mtmc_config.properties" "sink2" "source-id"}}
+
+    [message-converter]
+    enable = {{index .Values.configs "mtmc_config.properties" "message-converter" "enable"}}
+    msg-conv-config = {{index .Values.configs "mtmc_config.properties" "message-converter" "msg-conv-config"}}
+    msg-conv-payload-type = {{index .Values.configs "mtmc_config.properties" "message-converter" "msg-conv-payload-type"}}
+
+    [message-consumer0]
+    enable = {{index .Values.configs "mtmc_config.properties" "message-consumer0" "enable"}}
+    proto-lib = {{index .Values.configs "mtmc_config.properties" "message-consumer0" "proto-lib"}}
+    conn-str = {{index .Values.configs "mtmc_config.properties" "message-consumer0" "conn-str"}}
+    config-file = {{index .Values.configs "mtmc_config.properties" "message-consumer0" "config-file"}}
+    subscribe-topic-list = {{index .Values.configs "mtmc_config.properties" "message-consumer0" "subscribe-topic-list"}}
+
+    [osd]
+    enable = {{index .Values.configs "mtmc_config.properties" "osd" "enable"}}
+    gpu-id = {{index .Values.configs "mtmc_config.properties" "osd" "gpu-id"}}
+    border-width = {{index .Values.configs "mtmc_config.properties" "osd" "border-width"}}
+    text-size = {{index .Values.configs "mtmc_config.properties" "osd" "text-size"}}
+    text-color = {{index .Values.configs "mtmc_config.properties" "osd" "text-color"}}
+    text-bg-color = {{index .Values.configs "mtmc_config.properties" "osd" "text-bg-color"}}
+    font = {{index .Values.configs "mtmc_config.properties" "osd" "font"}}
+    show-clock = {{index .Values.configs "mtmc_config.properties" "osd" "show-clock"}}
+    clock-x-offset = {{index .Values.configs "mtmc_config.properties" "osd" "clock-x-offset"}}
+    clock-y-offset = {{index .Values.configs "mtmc_config.properties" "osd" "clock-y-offset"}}
+    clock-text-size = {{index .Values.configs "mtmc_config.properties" "osd" "clock-text-size"}}
+    clock-color = {{index .Values.configs "mtmc_config.properties" "osd" "clock-color"}}
+    nvbuf-memory-type = {{index .Values.configs "mtmc_config.properties" "osd" "nvbuf-memory-type"}}
+
+    [streammux]
+    gpu-id = {{index .Values.configs "mtmc_config.properties" "streammux" "gpu-id"}}
+    live-source = {{index .Values.configs "mtmc_config.properties" "streammux" "live-source"}}
+    batch-size = {{index .Values.configs "mtmc_config.properties" "streammux" "batch-size"}}
+    batched-push-timeout = {{index .Values.configs "mtmc_config.properties" "streammux" "batched-push-timeout"}}
+    width = {{index .Values.configs "mtmc_config.properties" "streammux" "width"}}
+    height = {{index .Values.configs "mtmc_config.properties" "streammux" "height"}}
+    enable-padding = {{index .Values.configs "mtmc_config.properties" "streammux" "enable-padding"}}
+    nvbuf-memory-type = {{index .Values.configs "mtmc_config.properties" "streammux" "nvbuf-memory-type"}}
+    attach-sys-ts-as-ntp = {{index .Values.configs "mtmc_config.properties" "streammux" "attach-sys-ts-as-ntp"}}
+
+    [primary-gie]
+    enable = {{index .Values.configs "mtmc_config.properties" "primary-gie" "enable"}}
+    gpu-id = {{index .Values.configs "mtmc_config.properties" "primary-gie" "gpu-id"}}
+    batch-size = {{index .Values.configs "mtmc_config.properties" "primary-gie" "batch-size"}}
+    bbox-border-color0 = {{index .Values.configs "mtmc_config.properties" "primary-gie" "bbox-border-color0"}}
+    bbox-border-color1 = {{index .Values.configs "mtmc_config.properties" "primary-gie" "bbox-border-color1"}}
+    bbox-border-color2 = {{index .Values.configs "mtmc_config.properties" "primary-gie" "bbox-border-color2"}}
+    bbox-border-color3 = {{index .Values.configs "mtmc_config.properties" "primary-gie" "bbox-border-color3"}}
+    interval = {{index .Values.configs "mtmc_config.properties" "primary-gie" "interval"}}
+    gie-unique-id = {{index .Values.configs "mtmc_config.properties" "primary-gie" "gie-unique-id"}}
+    nvbuf-memory-type = {{index .Values.configs "mtmc_config.properties" "primary-gie" "nvbuf-memory-type"}}
+    config-file = {{index .Values.configs "mtmc_config.properties" "primary-gie" "config-file"}}
+
+    [tracker]
+    enable = {{index .Values.configs "mtmc_config.properties" "tracker" "enable"}}
+    tracker-width = {{index .Values.configs "mtmc_config.properties" "tracker" "tracker-width"}}
+    tracker-height = {{index .Values.configs "mtmc_config.properties" "tracker" "tracker-height"}}
+    ll-lib-file = {{index .Values.configs "mtmc_config.properties" "tracker" "ll-lib-file"}}
+    ll-config-file = {{index .Values.configs "mtmc_config.properties" "tracker" "ll-config-file"}}
+    gpu-id = {{index .Values.configs "mtmc_config.properties" "tracker" "gpu-id"}}
+    enable-batch-process = {{index .Values.configs "mtmc_config.properties" "tracker" "enable-batch-process"}}
+    enable-past-frame = {{index .Values.configs "mtmc_config.properties" "tracker" "enable-past-frame"}}
+    display-tracking-id = {{index .Values.configs "mtmc_config.properties" "tracker" "display-tracking-id"}}
+
+    [secondary-gie0]
+    enable = {{index .Values.configs "mtmc_config.properties" "secondary-gie0" "enable"}}
+    gpu-id = {{index .Values.configs "mtmc_config.properties" "secondary-gie0" "gpu-id"}}
+    gie-unique-id = {{index .Values.configs "mtmc_config.properties" "secondary-gie0" "gie-unique-id"}}
+    operate-on-gie-id = {{index .Values.configs "mtmc_config.properties" "secondary-gie0" "operate-on-gie-id"}}
+    operate-on-class-ids = {{index .Values.configs "mtmc_config.properties" "secondary-gie0" "operate-on-class-ids"}}
+    batch-size = {{index .Values.configs "mtmc_config.properties" "secondary-gie0" "batch-size"}}
+    config-file = {{index .Values.configs "mtmc_config.properties" "secondary-gie0" "config-file"}}
+
+    [tests]
+    file-loop = {{index .Values.configs "mtmc_config.properties" "tests" "file-loop"}}
+
+
+  ppl_analytics_config.properties: |
+    [application]
+    enable-perf-measurement = {{index .Values.configs "ppl_analytics_config.properties" "application" "enable-perf-measurement"}}
+    perf-measurement-interval-sec = {{index .Values.configs "ppl_analytics_config.properties" "application" "perf-measurement-interval-sec"}}
+
+    [tiled-display]
+    enable = {{index .Values.configs "ppl_analytics_config.properties" "tiled-display" "enable"}}
+    rows = {{index .Values.configs "ppl_analytics_config.properties" "tiled-display" "rows"}}
+    columns = {{index .Values.configs "ppl_analytics_config.properties" "tiled-display" "columns"}}
+    width = {{index .Values.configs "ppl_analytics_config.properties" "tiled-display" "width"}}
+    height = {{index .Values.configs "ppl_analytics_config.properties" "tiled-display" "height"}}
+    gpu-id = {{index .Values.configs "ppl_analytics_config.properties" "tiled-display" "gpu-id"}}
+    nvbuf-memory-type = {{index .Values.configs "ppl_analytics_config.properties" "tiled-display" "nvbuf-memory-type"}}
+
+    [sourceTemplate]
+    enable = {{index .Values.configs "ppl_analytics_config.properties" "sourceTemplate" "enable"}}
+    type = {{index .Values.configs "ppl_analytics_config.properties" "sourceTemplate" "type"}}
+    uri = {{index .Values.configs "ppl_analytics_config.properties" "sourceTemplate" "uri"}}
+    num-sources = {{index .Values.configs "ppl_analytics_config.properties" "sourceTemplate" "num-sources"}}
+    gpu-id = {{index .Values.configs "ppl_analytics_config.properties" "sourceTemplate" "gpu-id"}}
+    nvbuf-memory-type = {{index .Values.configs "ppl_analytics_config.properties" "sourceTemplate" "nvbuf-memory-type"}}
+    latency = {{index .Values.configs "ppl_analytics_config.properties" "sourceTemplate" "latency"}}
+    rtsp-reconnect-interval-sec = {{index .Values.configs "ppl_analytics_config.properties" "sourceTemplate" "rtsp-reconnect-interval-sec"}}
+    select-rtp-protocol = {{index .Values.configs "ppl_analytics_config.properties" "sourceTemplate" "select-rtp-protocol"}}
+
+    [sink0]
+    enable = {{index .Values.configs "ppl_analytics_config.properties" "sink0" "enable"}}
+    type = {{index .Values.configs "ppl_analytics_config.properties" "sink0" "type"}}
+    sync = {{index .Values.configs "ppl_analytics_config.properties" "sink0" "sync"}}
+    source-id = {{index .Values.configs "ppl_analytics_config.properties" "sink0" "source-id"}}
+    gpu-id = {{index .Values.configs "ppl_analytics_config.properties" "sink0" "gpu-id"}}
+    nvbuf-memory-type = {{index .Values.configs "ppl_analytics_config.properties" "sink0" "nvbuf-memory-type"}}
+
+    [sink1]
+    enable = {{index .Values.configs "ppl_analytics_config.properties" "sink1" "enable"}}
+    type = {{index .Values.configs "ppl_analytics_config.properties" "sink1" "type"}}
+    msg-conv-config = {{index .Values.configs "ppl_analytics_config.properties" "sink1" "msg-conv-config"}}
+    msg-conv-payload-type = {{index .Values.configs "ppl_analytics_config.properties" "sink1" "msg-conv-payload-type"}}
+    msg-conv-msg2p-new-api = {{index .Values.configs "ppl_analytics_config.properties" "sink1" "msg-conv-msg2p-new-api"}}
+    msg-conv-frame-interval = {{index .Values.configs "ppl_analytics_config.properties" "sink1" "msg-conv-frame-interval"}}
+    msg-broker-proto-lib = {{index .Values.configs "ppl_analytics_config.properties" "sink1" "msg-broker-proto-lib"}}
+    msg-broker-conn-str = {{index .Values.configs "ppl_analytics_config.properties" "sink1" "msg-broker-conn-str"}}
+    topic = {{index .Values.configs "ppl_analytics_config.properties" "sink1" "topic"}}
+
+    [sink2]
+    enable = {{index .Values.configs "ppl_analytics_config.properties" "sink2" "enable"}}
+    type = {{index .Values.configs "ppl_analytics_config.properties" "sink2" "type"}}
+    container = {{index .Values.configs "ppl_analytics_config.properties" "sink2" "container"}}
+    codec = {{index .Values.configs "ppl_analytics_config.properties" "sink2" "codec"}}
+    sync = {{index .Values.configs "ppl_analytics_config.properties" "sink2" "sync"}}
+    bitrate = {{index .Values.configs "ppl_analytics_config.properties" "sink2" "bitrate"}}
+    output-file = {{index .Values.configs "ppl_analytics_config.properties" "sink2" "output-file"}}
+    source-id = {{index .Values.configs "ppl_analytics_config.properties" "sink2" "source-id"}}
+
+    [message-converter]
+    enable = {{index .Values.configs "ppl_analytics_config.properties" "message-converter" "enable"}}
+    msg-conv-config = {{index .Values.configs "ppl_analytics_config.properties" "message-converter" "msg-conv-config"}}
+    msg-conv-payload-type = {{index .Values.configs "ppl_analytics_config.properties" "message-converter" "msg-conv-payload-type"}}
+
+    [message-consumer0]
+    enable = {{index .Values.configs "ppl_analytics_config.properties" "message-consumer0" "enable"}}
+    proto-lib = {{index .Values.configs "ppl_analytics_config.properties" "message-consumer0" "proto-lib"}}
+    conn-str = {{index .Values.configs "ppl_analytics_config.properties" "message-consumer0" "conn-str"}}
+    config-file = {{index .Values.configs "ppl_analytics_config.properties" "message-consumer0" "config-file"}}
+    subscribe-topic-list = {{index .Values.configs "ppl_analytics_config.properties" "message-consumer0" "subscribe-topic-list"}}
+
+    [osd]
+    enable = {{index .Values.configs "ppl_analytics_config.properties" "osd" "enable"}}
+    gpu-id = {{index .Values.configs "ppl_analytics_config.properties" "osd" "gpu-id"}}
+    border-width = {{index .Values.configs "ppl_analytics_config.properties" "osd" "border-width"}}
+    text-size = {{index .Values.configs "ppl_analytics_config.properties" "osd" "text-size"}}
+    text-color = {{index .Values.configs "ppl_analytics_config.properties" "osd" "text-color"}}
+    text-bg-color = {{index .Values.configs "ppl_analytics_config.properties" "osd" "text-bg-color"}}
+    font = {{index .Values.configs "ppl_analytics_config.properties" "osd" "font"}}
+    show-clock = {{index .Values.configs "ppl_analytics_config.properties" "osd" "show-clock"}}
+    clock-x-offset = {{index .Values.configs "ppl_analytics_config.properties" "osd" "clock-x-offset"}}
+    clock-y-offset = {{index .Values.configs "ppl_analytics_config.properties" "osd" "clock-y-offset"}}
+    clock-text-size = {{index .Values.configs "ppl_analytics_config.properties" "osd" "clock-text-size"}}
+    clock-color = {{index .Values.configs "ppl_analytics_config.properties" "osd" "clock-color"}}
+    nvbuf-memory-type = {{index .Values.configs "ppl_analytics_config.properties" "osd" "nvbuf-memory-type"}}
+
+    [streammux]
+    gpu-id = {{index .Values.configs "ppl_analytics_config.properties" "streammux" "gpu-id"}}
+    live-source = {{index .Values.configs "ppl_analytics_config.properties" "streammux" "live-source"}}
+    batch-size = {{index .Values.configs "ppl_analytics_config.properties" "streammux" "batch-size"}}
+    batched-push-timeout = {{index .Values.configs "ppl_analytics_config.properties" "streammux" "batched-push-timeout"}}
+    width = {{index .Values.configs "ppl_analytics_config.properties" "streammux" "width"}}
+    height = {{index .Values.configs "ppl_analytics_config.properties" "streammux" "height"}}
+    enable-padding = {{index .Values.configs "ppl_analytics_config.properties" "streammux" "enable-padding"}}
+    nvbuf-memory-type = {{index .Values.configs "ppl_analytics_config.properties" "streammux" "nvbuf-memory-type"}}
+    attach-sys-ts-as-ntp = {{index .Values.configs "ppl_analytics_config.properties" "streammux" "attach-sys-ts-as-ntp"}}
+
+    [primary-gie]
+    enable = {{index .Values.configs "ppl_analytics_config.properties" "primary-gie" "enable"}}
+    gpu-id = {{index .Values.configs "ppl_analytics_config.properties" "primary-gie" "gpu-id"}}
+    batch-size = {{index .Values.configs "ppl_analytics_config.properties" "primary-gie" "batch-size"}}
+    bbox-border-color0 = {{index .Values.configs "ppl_analytics_config.properties" "primary-gie" "bbox-border-color0"}}
+    bbox-border-color1 = {{index .Values.configs "ppl_analytics_config.properties" "primary-gie" "bbox-border-color1"}}
+    bbox-border-color2 = {{index .Values.configs "ppl_analytics_config.properties" "primary-gie" "bbox-border-color2"}}
+    bbox-border-color3 = {{index .Values.configs "ppl_analytics_config.properties" "primary-gie" "bbox-border-color3"}}
+    interval = {{index .Values.configs "ppl_analytics_config.properties" "primary-gie" "interval"}}
+    gie-unique-id = {{index .Values.configs "ppl_analytics_config.properties" "primary-gie" "gie-unique-id"}}
+    nvbuf-memory-type = {{index .Values.configs "ppl_analytics_config.properties" "primary-gie" "nvbuf-memory-type"}}
+    config-file = {{index .Values.configs "ppl_analytics_config.properties" "primary-gie" "config-file"}}
+
+    [tracker]
+    enable = {{index .Values.configs "ppl_analytics_config.properties" "tracker" "enable"}}
+    tracker-width = {{index .Values.configs "ppl_analytics_config.properties" "tracker" "tracker-width"}}
+    tracker-height = {{index .Values.configs "ppl_analytics_config.properties" "tracker" "tracker-height"}}
+    ll-lib-file = {{index .Values.configs "ppl_analytics_config.properties" "tracker" "ll-lib-file"}}
+    ll-config-file = {{index .Values.configs "ppl_analytics_config.properties" "tracker" "ll-config-file"}}
+    gpu-id = {{index .Values.configs "ppl_analytics_config.properties" "tracker" "gpu-id"}}
+    enable-batch-process = {{index .Values.configs "ppl_analytics_config.properties" "tracker" "enable-batch-process"}}
+    enable-past-frame = {{index .Values.configs "ppl_analytics_config.properties" "tracker" "enable-past-frame"}}
+    display-tracking-id = {{index .Values.configs "ppl_analytics_config.properties" "tracker" "display-tracking-id"}}
+
+    [secondary-gie0]
+    enable = {{index .Values.configs "ppl_analytics_config.properties" "secondary-gie0" "enable"}}
+    gpu-id = {{index .Values.configs "ppl_analytics_config.properties" "secondary-gie0" "gpu-id"}}
+    gie-unique-id = {{index .Values.configs "ppl_analytics_config.properties" "secondary-gie0" "gie-unique-id"}}
+    operate-on-gie-id = {{index .Values.configs "ppl_analytics_config.properties" "secondary-gie0" "operate-on-gie-id"}}
+    operate-on-class-ids = {{index .Values.configs "ppl_analytics_config.properties" "secondary-gie0" "operate-on-class-ids"}}
+    batch-size = {{index .Values.configs "ppl_analytics_config.properties" "secondary-gie0" "batch-size"}}
+    config-file = {{index .Values.configs "ppl_analytics_config.properties" "secondary-gie0" "config-file"}}
+
+    [tests]
+    file-loop = {{index .Values.configs "ppl_analytics_config.properties" "tests" "file-loop"}}
+
+
+  mtmc_config_init.txt: |
+    [application]
+    enable-perf-measurement = {{index .Values.configs "mtmc_config_init.txt" "application" "enable-perf-measurement"}}
+    perf-measurement-interval-sec = {{index .Values.configs "mtmc_config_init.txt" "application" "perf-measurement-interval-sec"}}
+
+    [tiled-display]
+    enable = {{index .Values.configs "mtmc_config_init.txt" "tiled-display" "enable"}}
+    rows = {{index .Values.configs "mtmc_config_init.txt" "tiled-display" "rows"}}
+    columns = {{index .Values.configs "mtmc_config_init.txt" "tiled-display" "columns"}}
+    width = {{index .Values.configs "mtmc_config_init.txt" "tiled-display" "width"}}
+    height = {{index .Values.configs "mtmc_config_init.txt" "tiled-display" "height"}}
+    gpu-id = {{index .Values.configs "mtmc_config_init.txt" "tiled-display" "gpu-id"}}
+    nvbuf-memory-type = {{index .Values.configs "mtmc_config_init.txt" "tiled-display" "nvbuf-memory-type"}}
+
+    [source-list]
+    num-source-bins = {{index .Values.configs "mtmc_config_init.txt" "source-list" "num-source-bins"}}
+    list = {{index .Values.configs "mtmc_config_init.txt" "source-list" "list"}}
+    use-nvmultiurisrcbin = {{index .Values.configs "mtmc_config_init.txt" "source-list" "use-nvmultiurisrcbin"}}
+    max-batch-size = {{index .Values.configs "mtmc_config_init.txt" "source-list" "max-batch-size"}}
+    http-ip = {{index .Values.configs "mtmc_config_init.txt" "source-list" "http-ip"}}
+    http-port = {{index .Values.configs "mtmc_config_init.txt" "source-list" "http-port"}}
+    sgie-batch-size = {{index .Values.configs "mtmc_config_init.txt" "source-list" "sgie-batch-size"}}
+
+    [source-attr-all]
+    enable = {{index .Values.configs "mtmc_config_init.txt" "source-attr-all" "enable"}}
+    type = {{index .Values.configs "mtmc_config_init.txt" "source-attr-all" "type"}}
+    num-sources = {{index .Values.configs "mtmc_config_init.txt" "source-attr-all" "num-sources"}}
+    gpu-id = {{index .Values.configs "mtmc_config_init.txt" "source-attr-all" "gpu-id"}}
+    cudadec-memtype = {{index .Values.configs "mtmc_config_init.txt" "source-attr-all" "cudadec-memtype"}}
+    latency = {{index .Values.configs "mtmc_config_init.txt" "source-attr-all" "latency"}}
+    rtsp-reconnect-interval-sec = {{index .Values.configs "mtmc_config_init.txt" "source-attr-all" "rtsp-reconnect-interval-sec"}}
+
+    [sink0]
+    enable = {{index .Values.configs "mtmc_config_init.txt" "sink0" "enable"}}
+    type = {{index .Values.configs "mtmc_config_init.txt" "sink0" "type"}}
+    sync = {{index .Values.configs "mtmc_config_init.txt" "sink0" "sync"}}
+    source-id = {{index .Values.configs "mtmc_config_init.txt" "sink0" "source-id"}}
+    gpu-id = {{index .Values.configs "mtmc_config_init.txt" "sink0" "gpu-id"}}
+    nvbuf-memory-type = {{index .Values.configs "mtmc_config_init.txt" "sink0" "nvbuf-memory-type"}}
+
+    [sink1]
+    enable = {{index .Values.configs "mtmc_config_init.txt" "sink1" "enable"}}
+    type = {{index .Values.configs "mtmc_config_init.txt" "sink1" "type"}}
+    msg-conv-config = {{index .Values.configs "mtmc_config_init.txt" "sink1" "msg-conv-config"}}
+    msg-conv-payload-type = {{index .Values.configs "mtmc_config_init.txt" "sink1" "msg-conv-payload-type"}}
+    msg-conv-msg2p-new-api = {{index .Values.configs "mtmc_config_init.txt" "sink1" "msg-conv-msg2p-new-api"}}
+    msg-conv-frame-interval = {{index .Values.configs "mtmc_config_init.txt" "sink1" "msg-conv-frame-interval"}}
+    msg-broker-proto-lib = {{index .Values.configs "mtmc_config_init.txt" "sink1" "msg-broker-proto-lib"}}
+    msg-broker-conn-str = {{index .Values.configs "mtmc_config_init.txt" "sink1" "msg-broker-conn-str"}}
+    topic = {{index .Values.configs "mtmc_config_init.txt" "sink1" "topic"}}
+
+    [sink2]
+    enable = {{index .Values.configs "mtmc_config_init.txt" "sink2" "enable"}}
+    type = {{index .Values.configs "mtmc_config_init.txt" "sink2" "type"}}
+    container = {{index .Values.configs "mtmc_config_init.txt" "sink2" "container"}}
+    codec = {{index .Values.configs "mtmc_config_init.txt" "sink2" "codec"}}
+    sync = {{index .Values.configs "mtmc_config_init.txt" "sink2" "sync"}}
+    bitrate = {{index .Values.configs "mtmc_config_init.txt" "sink2" "bitrate"}}
+    output-file = {{index .Values.configs "mtmc_config_init.txt" "sink2" "output-file"}}
+    source-id = {{index .Values.configs "mtmc_config_init.txt" "sink2" "source-id"}}
+
+    [message-converter]
+    enable = {{index .Values.configs "mtmc_config_init.txt" "message-converter" "enable"}}
+    msg-conv-config = {{index .Values.configs "mtmc_config_init.txt" "message-converter" "msg-conv-config"}}
+    msg-conv-payload-type = {{index .Values.configs "mtmc_config_init.txt" "message-converter" "msg-conv-payload-type"}}
+
+    [message-consumer0]
+    enable = {{index .Values.configs "mtmc_config_init.txt" "message-consumer0" "enable"}}
+    proto-lib = {{index .Values.configs "mtmc_config_init.txt" "message-consumer0" "proto-lib"}}
+    conn-str = {{index .Values.configs "mtmc_config_init.txt" "message-consumer0" "conn-str"}}
+    config-file = {{index .Values.configs "mtmc_config_init.txt" "message-consumer0" "config-file"}}
+    subscribe-topic-list = {{index .Values.configs "mtmc_config_init.txt" "message-consumer0" "subscribe-topic-list"}}
+
+    [osd]
+    enable = {{index .Values.configs "mtmc_config_init.txt" "osd" "enable"}}
+    gpu-id = {{index .Values.configs "mtmc_config_init.txt" "osd" "gpu-id"}}
+    border-width = {{index .Values.configs "mtmc_config_init.txt" "osd" "border-width"}}
+    text-size = {{index .Values.configs "mtmc_config_init.txt" "osd" "text-size"}}
+    text-color = {{index .Values.configs "mtmc_config_init.txt" "osd" "text-color"}}
+    text-bg-color = {{index .Values.configs "mtmc_config_init.txt" "osd" "text-bg-color"}}
+    font = {{index .Values.configs "mtmc_config_init.txt" "osd" "font"}}
+    show-clock = {{index .Values.configs "mtmc_config_init.txt" "osd" "show-clock"}}
+    clock-x-offset = {{index .Values.configs "mtmc_config_init.txt" "osd" "clock-x-offset"}}
+    clock-y-offset = {{index .Values.configs "mtmc_config_init.txt" "osd" "clock-y-offset"}}
+    clock-text-size = {{index .Values.configs "mtmc_config_init.txt" "osd" "clock-text-size"}}
+    clock-color = {{index .Values.configs "mtmc_config_init.txt" "osd" "clock-color"}}
+    nvbuf-memory-type = {{index .Values.configs "mtmc_config_init.txt" "osd" "nvbuf-memory-type"}}
+
+    [streammux]
+    gpu-id = {{index .Values.configs "mtmc_config_init.txt" "streammux" "gpu-id"}}
+    live-source = {{index .Values.configs "mtmc_config_init.txt" "streammux" "live-source"}}
+    batch-size = {{index .Values.configs "mtmc_config_init.txt" "streammux" "batch-size"}}
+    batched-push-timeout = {{index .Values.configs "mtmc_config_init.txt" "streammux" "batched-push-timeout"}}
+    width = {{index .Values.configs "mtmc_config_init.txt" "streammux" "width"}}
+    height = {{index .Values.configs "mtmc_config_init.txt" "streammux" "height"}}
+    enable-padding = {{index .Values.configs "mtmc_config_init.txt" "streammux" "enable-padding"}}
+    nvbuf-memory-type = {{index .Values.configs "mtmc_config_init.txt" "streammux" "nvbuf-memory-type"}}
+    attach-sys-ts-as-ntp = {{index .Values.configs "mtmc_config_init.txt" "streammux" "attach-sys-ts-as-ntp"}}
+    drop-pipeline-eos = {{index .Values.configs "mtmc_config_init.txt" "streammux" "drop-pipeline-eos"}}
+
+    [primary-gie]
+    enable = {{index .Values.configs "mtmc_config_init.txt" "primary-gie" "enable"}}
+    gpu-id = {{index .Values.configs "mtmc_config_init.txt" "primary-gie" "gpu-id"}}
+    batch-size = {{index .Values.configs "mtmc_config_init.txt" "primary-gie" "batch-size"}}
+    bbox-border-color0 = {{index .Values.configs "mtmc_config_init.txt" "primary-gie" "bbox-border-color0"}}
+    bbox-border-color1 = {{index .Values.configs "mtmc_config_init.txt" "primary-gie" "bbox-border-color1"}}
+    bbox-border-color2 = {{index .Values.configs "mtmc_config_init.txt" "primary-gie" "bbox-border-color2"}}
+    bbox-border-color3 = {{index .Values.configs "mtmc_config_init.txt" "primary-gie" "bbox-border-color3"}}
+    interval = {{index .Values.configs "mtmc_config_init.txt" "primary-gie" "interval"}}
+    gie-unique-id = {{index .Values.configs "mtmc_config_init.txt" "primary-gie" "gie-unique-id"}}
+    nvbuf-memory-type = {{index .Values.configs "mtmc_config_init.txt" "primary-gie" "nvbuf-memory-type"}}
+    config-file = {{index .Values.configs "mtmc_config_init.txt" "primary-gie" "config-file"}}
+
+    [tracker]
+    enable = {{index .Values.configs "mtmc_config_init.txt" "tracker" "enable"}}
+    tracker-width = {{index .Values.configs "mtmc_config_init.txt" "tracker" "tracker-width"}}
+    tracker-height = {{index .Values.configs "mtmc_config_init.txt" "tracker" "tracker-height"}}
+    ll-lib-file = {{index .Values.configs "mtmc_config_init.txt" "tracker" "ll-lib-file"}}
+    ll-config-file = {{index .Values.configs "mtmc_config_init.txt" "tracker" "ll-config-file"}}
+    gpu-id = {{index .Values.configs "mtmc_config_init.txt" "tracker" "gpu-id"}}
+    enable-batch-process = {{index .Values.configs "mtmc_config_init.txt" "tracker" "enable-batch-process"}}
+    enable-past-frame = {{index .Values.configs "mtmc_config_init.txt" "tracker" "enable-past-frame"}}
+    display-tracking-id = {{index .Values.configs "mtmc_config_init.txt" "tracker" "display-tracking-id"}}
+
+    [secondary-gie0]
+    enable = {{index .Values.configs "mtmc_config_init.txt" "secondary-gie0" "enable"}}
+    gpu-id = {{index .Values.configs "mtmc_config_init.txt" "secondary-gie0" "gpu-id"}}
+    gie-unique-id = {{index .Values.configs "mtmc_config_init.txt" "secondary-gie0" "gie-unique-id"}}
+    operate-on-gie-id = {{index .Values.configs "mtmc_config_init.txt" "secondary-gie0" "operate-on-gie-id"}}
+    operate-on-class-ids = {{index .Values.configs "mtmc_config_init.txt" "secondary-gie0" "operate-on-class-ids"}}
+    batch-size = {{index .Values.configs "mtmc_config_init.txt" "secondary-gie0" "batch-size"}}
+    config-file = {{index .Values.configs "mtmc_config_init.txt" "secondary-gie0" "config-file"}}
+
+    [tests]
+    file-loop = {{index .Values.configs "mtmc_config_init.txt" "tests" "file-loop"}}
+
+
+  mtmc_config.txt: |
+    [application]
+    enable-perf-measurement = {{index .Values.configs "mtmc_config.txt" "application" "enable-perf-measurement"}}
+    perf-measurement-interval-sec = {{index .Values.configs "mtmc_config.txt" "application" "perf-measurement-interval-sec"}}
+
+    [tiled-display]
+    enable = {{index .Values.configs "mtmc_config.txt" "tiled-display" "enable"}}
+    rows = {{index .Values.configs "mtmc_config.txt" "tiled-display" "rows"}}
+    columns = {{index .Values.configs "mtmc_config.txt" "tiled-display" "columns"}}
+    width = {{index .Values.configs "mtmc_config.txt" "tiled-display" "width"}}
+    height = {{index .Values.configs "mtmc_config.txt" "tiled-display" "height"}}
+    gpu-id = {{index .Values.configs "mtmc_config.txt" "tiled-display" "gpu-id"}}
+    nvbuf-memory-type = {{index .Values.configs "mtmc_config.txt" "tiled-display" "nvbuf-memory-type"}}
+
+    [source-list]
+    num-source-bins = {{index .Values.configs "mtmc_config.txt" "source-list" "num-source-bins"}}
+    list = {{index .Values.configs "mtmc_config.txt" "source-list" "list"}}
+    use-nvmultiurisrcbin = {{index .Values.configs "mtmc_config.txt" "source-list" "use-nvmultiurisrcbin"}}
+    max-batch-size = {{index .Values.configs "mtmc_config.txt" "source-list" "max-batch-size"}}
+    http-ip = {{index .Values.configs "mtmc_config.txt" "source-list" "http-ip"}}
+    http-port = {{index .Values.configs "mtmc_config.txt" "source-list" "http-port"}}
+    sgie-batch-size = {{index .Values.configs "mtmc_config.txt" "source-list" "sgie-batch-size"}}
+
+    [source-attr-all]
+    enable = {{index .Values.configs "mtmc_config.txt" "source-attr-all" "enable"}}
+    type = {{index .Values.configs "mtmc_config.txt" "source-attr-all" "type"}}
+    num-sources = {{index .Values.configs "mtmc_config.txt" "source-attr-all" "num-sources"}}
+    gpu-id = {{index .Values.configs "mtmc_config.txt" "source-attr-all" "gpu-id"}}
+    cudadec-memtype = {{index .Values.configs "mtmc_config.txt" "source-attr-all" "cudadec-memtype"}}
+    latency = {{index .Values.configs "mtmc_config.txt" "source-attr-all" "latency"}}
+    rtsp-reconnect-interval-sec = {{index .Values.configs "mtmc_config.txt" "source-attr-all" "rtsp-reconnect-interval-sec"}}
+
+    [sink0]
+    enable = {{index .Values.configs "mtmc_config.txt" "sink0" "enable"}}
+    type = {{index .Values.configs "mtmc_config.txt" "sink0" "type"}}
+    sync = {{index .Values.configs "mtmc_config.txt" "sink0" "sync"}}
+    source-id = {{index .Values.configs "mtmc_config.txt" "sink0" "source-id"}}
+    gpu-id = {{index .Values.configs "mtmc_config.txt" "sink0" "gpu-id"}}
+    nvbuf-memory-type = {{index .Values.configs "mtmc_config.txt" "sink0" "nvbuf-memory-type"}}
+
+    [sink1]
+    enable = {{index .Values.configs "mtmc_config.txt" "sink1" "enable"}}
+    type = {{index .Values.configs "mtmc_config.txt" "sink1" "type"}}
+    msg-conv-config = {{index .Values.configs "mtmc_config.txt" "sink1" "msg-conv-config"}}
+    msg-conv-payload-type = {{index .Values.configs "mtmc_config.txt" "sink1" "msg-conv-payload-type"}}
+    msg-conv-msg2p-new-api = {{index .Values.configs "mtmc_config.txt" "sink1" "msg-conv-msg2p-new-api"}}
+    msg-conv-frame-interval = {{index .Values.configs "mtmc_config.txt" "sink1" "msg-conv-frame-interval"}}
+    msg-broker-proto-lib = {{index .Values.configs "mtmc_config.txt" "sink1" "msg-broker-proto-lib"}}
+    msg-broker-conn-str = {{index .Values.configs "mtmc_config.txt" "sink1" "msg-broker-conn-str"}}
+    topic = {{index .Values.configs "mtmc_config.txt" "sink1" "topic"}}
+
+    [sink2]
+    enable = {{index .Values.configs "mtmc_config.txt" "sink2" "enable"}}
+    type = {{index .Values.configs "mtmc_config.txt" "sink2" "type"}}
+    container = {{index .Values.configs "mtmc_config.txt" "sink2" "container"}}
+    codec = {{index .Values.configs "mtmc_config.txt" "sink2" "codec"}}
+    sync = {{index .Values.configs "mtmc_config.txt" "sink2" "sync"}}
+    bitrate = {{index .Values.configs "mtmc_config.txt" "sink2" "bitrate"}}
+    output-file = {{index .Values.configs "mtmc_config.txt" "sink2" "output-file"}}
+    source-id = {{index .Values.configs "mtmc_config.txt" "sink2" "source-id"}}
+
+    [message-converter]
+    enable = {{index .Values.configs "mtmc_config.txt" "message-converter" "enable"}}
+    msg-conv-config = {{index .Values.configs "mtmc_config.txt" "message-converter" "msg-conv-config"}}
+    msg-conv-payload-type = {{index .Values.configs "mtmc_config.txt" "message-converter" "msg-conv-payload-type"}}
+
+    [message-consumer0]
+    enable = {{index .Values.configs "mtmc_config.txt" "message-consumer0" "enable"}}
+    proto-lib = {{index .Values.configs "mtmc_config.txt" "message-consumer0" "proto-lib"}}
+    conn-str = {{index .Values.configs "mtmc_config.txt" "message-consumer0" "conn-str"}}
+    config-file = {{index .Values.configs "mtmc_config.txt" "message-consumer0" "config-file"}}
+    subscribe-topic-list = {{index .Values.configs "mtmc_config.txt" "message-consumer0" "subscribe-topic-list"}}
+
+    [osd]
+    enable = {{index .Values.configs "mtmc_config.txt" "osd" "enable"}}
+    gpu-id = {{index .Values.configs "mtmc_config.txt" "osd" "gpu-id"}}
+    border-width = {{index .Values.configs "mtmc_config.txt" "osd" "border-width"}}
+    text-size = {{index .Values.configs "mtmc_config.txt" "osd" "text-size"}}
+    text-color = {{index .Values.configs "mtmc_config.txt" "osd" "text-color"}}
+    text-bg-color = {{index .Values.configs "mtmc_config.txt" "osd" "text-bg-color"}}
+    font = {{index .Values.configs "mtmc_config.txt" "osd" "font"}}
+    show-clock = {{index .Values.configs "mtmc_config.txt" "osd" "show-clock"}}
+    clock-x-offset = {{index .Values.configs "mtmc_config.txt" "osd" "clock-x-offset"}}
+    clock-y-offset = {{index .Values.configs "mtmc_config.txt" "osd" "clock-y-offset"}}
+    clock-text-size = {{index .Values.configs "mtmc_config.txt" "osd" "clock-text-size"}}
+    clock-color = {{index .Values.configs "mtmc_config.txt" "osd" "clock-color"}}
+    nvbuf-memory-type = {{index .Values.configs "mtmc_config.txt" "osd" "nvbuf-memory-type"}}
+
+    [streammux]
+    gpu-id = {{index .Values.configs "mtmc_config.txt" "streammux" "gpu-id"}}
+    live-source = {{index .Values.configs "mtmc_config.txt" "streammux" "live-source"}}
+    batch-size = {{index .Values.configs "mtmc_config.txt" "streammux" "batch-size"}}
+    batched-push-timeout = {{index .Values.configs "mtmc_config.txt" "streammux" "batched-push-timeout"}}
+    width = {{index .Values.configs "mtmc_config.txt" "streammux" "width"}}
+    height = {{index .Values.configs "mtmc_config.txt" "streammux" "height"}}
+    enable-padding = {{index .Values.configs "mtmc_config.txt" "streammux" "enable-padding"}}
+    nvbuf-memory-type = {{index .Values.configs "mtmc_config.txt" "streammux" "nvbuf-memory-type"}}
+    attach-sys-ts-as-ntp = {{index .Values.configs "mtmc_config.txt" "streammux" "attach-sys-ts-as-ntp"}}
+    drop-pipeline-eos = {{index .Values.configs "mtmc_config.txt" "streammux" "drop-pipeline-eos"}}
+
+    [primary-gie]
+    enable = {{index .Values.configs "mtmc_config.txt" "primary-gie" "enable"}}
+    gpu-id = {{index .Values.configs "mtmc_config.txt" "primary-gie" "gpu-id"}}
+    batch-size = {{index .Values.configs "mtmc_config.txt" "primary-gie" "batch-size"}}
+    bbox-border-color0 = {{index .Values.configs "mtmc_config.txt" "primary-gie" "bbox-border-color0"}}
+    bbox-border-color1 = {{index .Values.configs "mtmc_config.txt" "primary-gie" "bbox-border-color1"}}
+    bbox-border-color2 = {{index .Values.configs "mtmc_config.txt" "primary-gie" "bbox-border-color2"}}
+    bbox-border-color3 = {{index .Values.configs "mtmc_config.txt" "primary-gie" "bbox-border-color3"}}
+    interval = {{index .Values.configs "mtmc_config.txt" "primary-gie" "interval"}}
+    gie-unique-id = {{index .Values.configs "mtmc_config.txt" "primary-gie" "gie-unique-id"}}
+    nvbuf-memory-type = {{index .Values.configs "mtmc_config.txt" "primary-gie" "nvbuf-memory-type"}}
+    config-file = {{index .Values.configs "mtmc_config.txt" "primary-gie" "config-file"}}
+
+    [tracker]
+    enable = {{index .Values.configs "mtmc_config.txt" "tracker" "enable"}}
+    tracker-width = {{index .Values.configs "mtmc_config.txt" "tracker" "tracker-width"}}
+    tracker-height = {{index .Values.configs "mtmc_config.txt" "tracker" "tracker-height"}}
+    ll-lib-file = {{index .Values.configs "mtmc_config.txt" "tracker" "ll-lib-file"}}
+    ll-config-file = {{index .Values.configs "mtmc_config.txt" "tracker" "ll-config-file"}}
+    gpu-id = {{index .Values.configs "mtmc_config.txt" "tracker" "gpu-id"}}
+    enable-batch-process = {{index .Values.configs "mtmc_config.txt" "tracker" "enable-batch-process"}}
+    enable-past-frame = {{index .Values.configs "mtmc_config.txt" "tracker" "enable-past-frame"}}
+    display-tracking-id = {{index .Values.configs "mtmc_config.txt" "tracker" "display-tracking-id"}}
+
+    [secondary-gie0]
+    enable = {{index .Values.configs "mtmc_config.txt" "secondary-gie0" "enable"}}
+    gpu-id = {{index .Values.configs "mtmc_config.txt" "secondary-gie0" "gpu-id"}}
+    gie-unique-id = {{index .Values.configs "mtmc_config.txt" "secondary-gie0" "gie-unique-id"}}
+    operate-on-gie-id = {{index .Values.configs "mtmc_config.txt" "secondary-gie0" "operate-on-gie-id"}}
+    operate-on-class-ids = {{index .Values.configs "mtmc_config.txt" "secondary-gie0" "operate-on-class-ids"}}
+    batch-size = {{index .Values.configs "mtmc_config.txt" "secondary-gie0" "batch-size"}}
+    config-file = {{index .Values.configs "mtmc_config.txt" "secondary-gie0" "config-file"}}
+
+    [tests]
+    file-loop = {{index .Values.configs "mtmc_config.txt" "tests" "file-loop"}}
+
+
+  mtmc_sgie_config_ddetr.txt: |
+    [property]
+    gpu-id = {{index .Values.configs "mtmc_sgie_config_ddetr.txt" "property" "gpu-id"}}
+    net-scale-factor = {{index .Values.configs "mtmc_sgie_config_ddetr.txt" "property" "net-scale-factor"}}
+    offsets = {{index .Values.configs "mtmc_sgie_config_ddetr.txt" "property" "offsets"}}
+    model-engine-file = {{index .Values.configs "mtmc_sgie_config_ddetr.txt" "property" "model-engine-file"}}
+    onnx-file = {{index .Values.configs "mtmc_sgie_config_ddetr.txt" "property" "onnx-file"}}
+    infer-dims = {{index .Values.configs "mtmc_sgie_config_ddetr.txt" "property" "infer-dims"}}
+    batch-size = {{index .Values.configs "mtmc_sgie_config_ddetr.txt" "property" "batch-size"}}
+    network-mode = {{index .Values.configs "mtmc_sgie_config_ddetr.txt" "property" "network-mode"}}
+    network-type = {{index .Values.configs "mtmc_sgie_config_ddetr.txt" "property" "network-type"}}
+    interval = {{index .Values.configs "mtmc_sgie_config_ddetr.txt" "property" "interval"}}
+    process-mode = {{index .Values.configs "mtmc_sgie_config_ddetr.txt" "property" "process-mode"}}
+    gie-unique-id = {{index .Values.configs "mtmc_sgie_config_ddetr.txt" "property" "gie-unique-id"}}
+    classifier-threshold = {{index .Values.configs "mtmc_sgie_config_ddetr.txt" "property" "classifier-threshold"}}
+    operate-on-gie-id = {{index .Values.configs "mtmc_sgie_config_ddetr.txt" "property" "operate-on-gie-id"}}
+    output-tensor-meta = {{index .Values.configs "mtmc_sgie_config_ddetr.txt" "property" "output-tensor-meta"}}
+    model-color-format = {{index .Values.configs "mtmc_sgie_config_ddetr.txt" "property" "model-color-format"}}
+    maintain-aspect-ratio = {{index .Values.configs "mtmc_sgie_config_ddetr.txt" "property" "maintain-aspect-ratio"}}
+    operate-on-class-ids = {{index .Values.configs "mtmc_sgie_config_ddetr.txt" "property" "operate-on-class-ids"}}
+
+
+  config.yaml: |
+    {{- index .Values.configs "config.yaml" | toYaml | nindent 4 }}
+  mtmc_init_workload: |
+    {{- index .Values.configs "mtmc_init_workload" | toYaml | nindent 4 }}
+  cfg_kafka.txt: |
+    [message-broker]
+    partition-key = {{index .Values.configs "cfg_kafka.txt" "message-broker" "partition-key"}}
+
+

@@ -1,0 +1,78 @@
+Component:
+  app-version: application-version
+  description: my test helm chart
+  helmUrlLocationPath: https://helm.ngc.nvidia.com/myorg/myteam/charts
+  name: mdx-elasticsearch-kibana
+  version: 0.0.1
+
+elasticsearch:
+  image: "docker.elastic.co/elasticsearch/elasticsearch"
+  imageTag: "7.16.3"
+  imagePullPolicy: "IfNotPresent"
+  esJavaOpts: -Xmx4g -Xms4g
+  clusterName: mdx-elasticsearch-cluster
+  nodeGroup: master
+  replicas: 1
+  minimumMasterNodes: 1
+  volumeClaimTemplate:
+    accessModes: [ "ReadWriteOnce" ]
+    resources:
+      requests:
+        storage: 10Gi
+    storageClassName: mdx-local-path
+  nodeSelector: {}
+  nodeSelectorTerms: []
+  antiAffinity: "soft"
+  podSecurityPolicy:
+    create: true
+  esConfig:
+    elasticsearch.yml: |
+      processors: 1
+      thread_pool:
+        write:
+          size: 1
+          queue_size: 300
+  resources:
+    requests:
+      cpu: 1000m
+      memory: 4Gi
+    limits:
+      cpu: 2000m
+      memory: 8Gi
+  networkHost: "0.0.0.0"
+
+kibana:
+  elasticsearchHosts: http://mdx-elasticsearch-cluster-master-headless:9200
+  image: "docker.elastic.co/kibana/kibana"
+  imageTag: "7.8.1"
+  imagePullPolicy: "IfNotPresent"
+  replicas: 1
+  resources:
+    requests:
+      cpu: "100m"
+      memory: "500Mi"
+    limits:
+      cpu: "1000m"
+      memory: 2Gi
+  protocol: http
+  serverHost: "0.0.0.0"
+  nodeSelector: {}
+  service:
+    name: mdx-elasticsearch-kibana      
+    type: NodePort
+    port: 5601
+    nodePort: "31560"
+  fullnameOverride: mdx-elasticsearch-kibana   
+
+ingress:
+  enabled: true
+  hosts:
+  - http:
+      paths:
+      - path: /elastic(/|$)(.*)
+        pathType: Prefix
+        backend:
+          service: 
+            name: mdx-elasticsearch-cluster-master
+            port: 
+              number: 9200

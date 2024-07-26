@@ -1,0 +1,157 @@
+{{- $topValues := .Values }}
+{{- if $topValues.applicationSpecs }}
+{{- $applicationSpecs := $topValues.applicationSpecs }}
+{{- range $appname, $appData := $applicationSpecs }}
+{{if eq $appData.apptype "daemonset" }}
+{{- $containers := $appData.containers }}
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: {{ $.Chart.Name }}-{{ $appname }}
+  labels:
+    app: {{ $.Chart.Name }}-{{ $appname }}
+{{ include "hb.labels.standard" . | indent 4 }}
+
+spec:
+  selector:
+    matchLabels:
+      app: {{ $.Chart.Name }}-{{ $appname }}
+  template:
+    metadata:
+      labels:
+        app: {{ $.Chart.Name }}-{{ $appname}}
+{{ include "hb.labels.standard" . | indent 8 }}
+    spec:
+      securityContext:
+      {{- $appData.podSecurityContext | default $topValues.podSecurityContext | toYaml | nindent 8 }}
+      {{- with $topValues.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- if $appData.dnsPolicy }}
+      dnsPolicy: {{ $appData.dnsPolicy }}
+      {{- end }}
+      {{- if $appData.restartPolicy }}
+      restartPolicy: {{ $appData.restartPolicy }}
+      {{- end }}
+      {{- with $appData.initContainers }}
+      initContainers:
+      {{- range $appData.initContainers }}
+      - {{- toYaml . | nindent 8 }} 
+        volumeMounts:
+        {{- if $topValues.defaultVolumeMounts }}
+        {{- range $mount := $topValues.defaultVolumeMounts }}
+          - name: {{ $mount.name }}
+            mountPath: {{ $mount.mountPath }}
+            subPath: {{ $mount.subPath }}
+        {{- end }}
+        {{- end }}
+        {{- if $appData.volumeMounts }}
+          {{- toYaml $appData.volumeMounts |  nindent 10 }}
+        {{- end }}
+      {{- end }}
+      {{- end }}
+      containers:
+      {{- range $containerName, $container := $containers }}
+        - name: {{ $containerName }}
+          image: {{ $container.image.repository }}:{{ $container.image.tag }}{{if $container.image.pullPolicy }}
+          imagePullPolicy: {{ $container.image.pullPolicy }}{{else if (($topValues.image).pullPolicy) }}
+          imagePullPolicy: {{ $topValues.image.pullPolicy }}
+          {{- end }}
+          {{- if $container.command }}
+          command:
+            {{- toYaml $container.command |  nindent 12 }}
+          {{- end }}
+          {{- if $container.args }}
+          args:
+            {{- toYaml $container.args |  nindent 10 }}
+          {{- end }}
+          {{- if $container.env }}
+          env:
+          {{- toYaml $container.env | nindent 10 }}
+          {{- end }}
+          securityContext:
+          {{- $container.securityContext | default $topValues.securityContext  | toYaml | nindent 12 }}
+          {{- if $container.readinessProbe  }}
+          readinessProbe:
+            {{- toYaml $container.readinessProbe | nindent 12 }}
+          {{- end }}
+          {{- if $container.livenessProbe  }}
+          livenessProbe:
+            {{- toYaml $container.livenessProbe | nindent 12 }}
+          {{- end }}
+          {{- if $container.startupProbe  }}
+          startupProbe:
+            {{- toYaml $container.startupProbe | nindent 12 }}
+          {{- end }}
+
+          {{- if $container.resources }}
+          #cont resources
+          resources:
+          {{- toYaml $container.resources| nindent 12 }}
+          {{- end }}
+          volumeMounts:
+          {{- if $topValues.defaultVolumeMounts }}
+            #Default volumeMounts
+          {{- range $mount := $topValues.defaultVolumeMounts }}
+            - name: {{ $mount.name }}
+              mountPath: {{ $mount.mountPath }}
+              subPath: {{ $mount.subPath }}
+          {{- end }}
+          {{- end }}
+          {{- if $container.volumeMounts }}
+            #Container volumeMounts
+            {{- toYaml $container.volumeMounts |  nindent 12 }}
+          {{- end }}
+          {{- if $container.ports }}
+          ports:
+          {{- range $port := $container.ports }}
+          {{- if $port.range }}
+          {{- range (until (int $port.range)) }}
+            - containerPort: {{ add $port.containerPort . }}
+              {{- if $port.name }}
+              name: {{ $port.name }}-{{ . }}
+              {{- end }}
+              {{- if $port.hostIP }}
+              hostIP: {{ $port.hostIP }}
+              {{- end }}
+              {{- if $port.hostPort }}
+              hostPort: {{ add $port.hostPort . }}
+              {{- end }}
+              {{- if $port.protocol }}
+              protocol: {{ $port.protocol }}
+              {{- end }}
+          {{- end}}
+          {{- else }}
+            - {{ $port | toYaml | indent 14 | trim -}}
+          {{- end }}
+          {{- end }}
+          {{- end }}
+      {{- end }}
+      {{- with $appData.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with $appData.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with $appData.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      volumes:
+      {{- if $appData.volumes }}
+        #App Volumes
+        {{- toYaml $appData.volumes |  nindent 8 }}
+      {{- end }}
+      {{- if $topValues.defaultVolumes }}
+        #Default Volumes
+      {{- range $vol := $topValues.defaultVolumes }}
+        - {{ toYaml $vol | nindent 10 }}
+      {{- end }}
+      {{- end }}
+{{- end }}
+{{- end }}
+{{- end }}

@@ -1,0 +1,6 @@
+apiVersion: v2
+appVersion: 0.2.18
+description: Custom flask controller for the fsl application
+name: fsl-flaskcontroller
+type: application
+version: 0.2.18

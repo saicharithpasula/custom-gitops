@@ -1,0 +1,76 @@
+{
+    "name": "fsl-app",
+    "version": "0.2.2",
+    "time-utc": "2023-02-22 20:54:27",
+    "appbuilder-version": "1.1.0",
+    "compliance-development-mandatory-overall": 96.29,
+    "compliance-development-optional-overall": 66.65,
+    "compliance-ms": [
+        {
+            "name": "ucf.svc.metropolis.perception",
+            "version": "0.2.13",
+            "compliance-development-mandatory": 100.0,
+            "compliance-development-optional": 66.66
+        },
+        {
+            "name": "ucf.svc.vms",
+            "version": "1.1.35",
+            "compliance-development-mandatory": 100.0,
+            "compliance-development-optional": 66.66
+        },
+        {
+            "name": "ucf.svc.oss.redis",
+            "version": "0.0.6",
+            "compliance-development-mandatory": 100.0,
+            "compliance-development-optional": 66.66
+        },
+        {
+            "name": "ucf.svc.metropolis.fsl-similarity-search",
+            "version": "0.3.14",
+            "compliance-development-mandatory": 100.0,
+            "compliance-development-optional": 66.66
+        },
+        {
+            "name": "ucf.svc.metropolis.fsl-flask-controller",
+            "version": "0.2.18",
+            "compliance-development-mandatory": 100.0,
+            "compliance-development-optional": 66.66
+        },
+        {
+            "name": "ucf.svc.metropolis.fsl-evaluator",
+            "version": "0.2.14",
+            "compliance-development-mandatory": 100.0,
+            "compliance-development-optional": 66.66
+        },
+        {
+            "name": "ucf.svc.oss.mongodb",
+            "version": "0.0.3",
+            "compliance-development-mandatory": 100.0,
+            "compliance-development-optional": 66.66
+        },
+        {
+            "name": "ucf.svc.metropolis.fsl-embedding",
+            "version": "0.3.20",
+            "compliance-development-mandatory": 100.0,
+            "compliance-development-optional": 66.66
+        },
+        {
+            "name": "ucf.svc.mdx-logstash",
+            "version": "1.0.0",
+            "compliance-development-mandatory": 87.5,
+            "compliance-development-optional": 66.66
+        },
+        {
+            "name": "ucf.svc.mdx-elasticsearch-kibana",
+            "version": "1.0.0",
+            "compliance-development-mandatory": 83.33,
+            "compliance-development-optional": 66.66
+        },
+        {
+            "name": "ucf.svc.core.milvus-db",
+            "version": "0.0.1",
+            "compliance-development-mandatory": 88.46,
+            "compliance-development-optional": 66.66
+        }
+    ]
+}

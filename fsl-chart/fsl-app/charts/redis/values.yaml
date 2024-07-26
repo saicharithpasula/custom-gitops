@@ -1,0 +1,123 @@
+Component:
+  app-version: 0.0.6
+  description: redis service
+  helmUrlLocationPath: https://helm.ngc.nvidia.com/myorg/myteam/charts
+  name: redis
+  version: 0.0.6
+affinity: {}
+applicationSpecs:
+  redis:
+    apptype: stateless
+    containers:
+      redis-container:
+        args:
+        - redis-server /opt/configs/redis.conf
+        command:
+        - sh
+        - -c
+        image:
+          pullPolicy: IfNotPresent
+          repository: redis
+          tag: 7.0.2
+        livenessProbe:
+          exec:
+            command:
+            - redis-cli
+            - PING
+        ports:
+        - containerPort: 6379
+          name: tcp
+        readinessProbe:
+          exec:
+            command:
+            - redis-cli
+            - PING
+        volumeMounts:
+        - mountPath: /opt/data
+          name: app-data
+    securityContext:
+      runAsGroup: 1000
+      runAsUser: 1000
+    services:
+      svc:
+        ports:
+        - name: redis
+          port: 6379
+          protocol: TCP
+    volumes:
+    - name: app-data
+      persistentVolumeClaim:
+        claimName: redis-data-pvc
+defaultVolumeMounts:
+- mountPath: /opt/workload-config
+  name: workload-cm-volume
+- mountPath: /opt/configs
+  name: configs-volume
+- mountPath: /opt/scripts
+  name: scripts-cm-volume
+defaultVolumes:
+- configMap:
+    name: redis-workload-cm
+  name: workload-cm-volume
+- configMap:
+    name: redis-configs-cm
+  name: configs-volume
+- configMap:
+    name: redis-scripts-cm
+  name: scripts-cm-volume
+egress: {}
+image:
+  pullPolicy: IfNotPresent
+imagePullSecrets: []
+ingress:
+  enabled: false
+nodeSelector: {}
+podAnnotations: {}
+podSecurityContext: {}
+replicaCount: 1
+resources: {}
+securityContext: {}
+storageClaims:
+  data:
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: 500Gi
+      storageClassName: $params.storageClassName
+      volumeName: null
+storageClassName: mdx-local-path
+tolerations: []
+workloadSpecs:
+  dummy: {}
+
+
+
+configs:
+  config.yaml:
+    SampleConfig:
+      sampleValue: 0
+  redis.conf: "bind 0.0.0.0 \nport 6379\ntcp-backlog 511\ntimeout 0\ntcp-keepalive\
+    \ 300\ndaemonize no\nsupervised no\npidfile /var/run/redis_6379.pid\nloglevel\
+    \ notice\nlogfile \"\"\ndatabases 16\nalways-show-logo yes\nsave 5 1\nsave 900\
+    \ 1\nsave 300 10\nsave 60 10000\nstop-writes-on-bgsave-error no\nrdbcompression\
+    \ yes\nrdbchecksum yes\ndbfilename db.rdb\nrdb-del-sync-files no\ndir /opt/data\n\
+    replica-serve-stale-data yes\nreplica-read-only yes\nrepl-diskless-sync no\nrepl-diskless-sync-delay\
+    \ 5\nrepl-diskless-load disabled\nrepl-disable-tcp-nodelay no\nreplica-priority\
+    \ 100\nacllog-max-len 128\nlazyfree-lazy-eviction no\nlazyfree-lazy-expire no\n\
+    lazyfree-lazy-server-del no\nreplica-lazy-flush no\nlazyfree-lazy-user-del no\n\
+    oom-score-adj no\noom-score-adj-values 0 200 800\nappendonly no\nappendfilename\
+    \ \"appendonly.aof\"\nappendfsync everysec\nno-appendfsync-on-rewrite no\nauto-aof-rewrite-percentage\
+    \ 100\nauto-aof-rewrite-min-size 64mb\naof-load-truncated yes\naof-use-rdb-preamble\
+    \ yes\nlua-time-limit 5000\nlatency-monitor-threshold 0\nnotify-keyspace-events\
+    \ \"\"\nhash-max-ziplist-entries 512\nhash-max-ziplist-value 64\nlist-max-ziplist-size\
+    \ -2\nlist-compress-depth 0\nset-max-intset-entries 512\nzset-max-ziplist-entries\
+    \ 128\nzset-max-ziplist-value 64\nhll-sparse-max-bytes 3000\nstream-node-max-bytes\
+    \ 4096\nstream-node-max-entries 100\nactiverehashing yes\nclient-output-buffer-limit\
+    \ normal 0 0 0\nclient-output-buffer-limit replica 256mb 64mb 60\nclient-output-buffer-limit\
+    \ pubsub 32mb 8mb 60\nhz 10\ndynamic-hz yes\naof-rewrite-incremental-fsync yes\n\
+    rdb-save-incremental-fsync yes\njemalloc-bg-thread yes\nrename-command FLUSHALL\
+    \ \"\"\nrename-command EVAL \"\"\nrename-command FLUSHDB \"\"\nnotify-keyspace-events\
+    \ KAsx\n\n"
+

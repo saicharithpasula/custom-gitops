@@ -1,0 +1,223 @@
+Component:
+  app-version: 0.3.20
+  description: fsl embedding generation
+  helmUrlLocationPath: https://helm.ngc.nvidia.com/myorg/myteam/charts
+  name: fsl-embeddinggeneration
+  version: 0.3.20
+affinity: {}
+applicationSpecs:
+  fsl-embeddinggeneration-deployment:
+    apptype: stateless
+    containers:
+      fsl-embeddinggeneration-container:
+        args:
+        - python main.pyc
+        command:
+        - sh
+        - -c
+        env:
+        - name: LOG_LEVEL
+          value: $params.logLevel
+        - name: LOG_FILE
+          value: /opt/storage/logs
+        - name: MESSAGE_HOST
+          value: $egress.redis.address
+        - name: MESSAGE_PORT
+          value: $egress.redis.port
+        - name: SIMSEARCH_HOST
+          value: $egress.milvus.address
+        - name: SIMSEARCH_PORT
+          value: $egress.milvus.port
+        - name: SIMSEARCH_COLL_NAME
+          value: test_collection
+        - name: DB_HOST
+          value: $egress.mongodb.address
+        - name: DB_PORT
+          value: $egress.mongodb.port
+        - name: MODEL_FILE
+          value: /opt/storage/models/embedder.onnx
+        - name: UNSEEN_DIR
+          value: /opt/feedback
+        - name: MESSAGE_CHANNEL
+          value: embedding_generation
+        - name: BIGDUMP_DIR
+          value: /opt/input
+        - name: BATCH_SIZE
+          value: $params.batchSize
+        - name: DIMS
+          value: $params.embeddingDims
+        image:
+          pullPolicy: Always
+          repository: nvcr.io/nfgnkvuikvjm/mdx-v1_0/fsl-embeddinggeneration
+          tag: '1.0'
+        livenessProbe:
+          exec:
+            command:
+            - echo
+            - TODO livenessProbe
+          initialDelaySeconds: 10
+          periodSeconds: 5
+        readinessProbe:
+          exec:
+            command:
+            - echo
+            - TODO readinessProbe
+          initialDelaySeconds: 10
+          periodSeconds: 5
+        startupProbe:
+          exec:
+            command:
+            - echo
+            - TODO startupProbe
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        volumeMounts:
+        - mountPath: /opt/feedback
+          name: input-storage
+          subPath: unseen
+        - mountPath: /opt/input
+          name: input-storage
+          subPath: simsearch
+    initContainers:
+    - args:
+      - until curl --connect-timeout 1 $egress.redis.address:$egress.redis.port 2>&1
+        | grep 'Empty reply from server' >/dev/null; do echo "Waiting for redis";
+        done
+      command:
+      - sh
+      - -c
+      image: curlimages/curl:7.83.1
+      name: check-redis-up
+    - args:
+      - ' bash download_data.sh'
+      command:
+      - sh
+      - -c
+      env:
+      - name: NGC_CLI_API_KEY
+        valueFrom:
+          secretKeyRef:
+            key: NGC_CLI_API_KEY
+            name: ngc-api-key-secret
+            optional: false
+      - name: EMBEDDER_URL
+        value: $params.embedderUrl
+      - name: EMBEDDER_NAME
+        value: $params.embedderName
+      - name: EMBEDDER_MODEL_KEY
+        value: $params.embedderModelKey
+      - name: NUM_RETRIES
+        value: $params.downloadRetries
+      image: nvcr.io/nfgnkvuikvjm/mdx-v1_0/fsl-similaritysearch:1.0
+      imagePullPolicy: Always
+      name: prepare-data
+    - command:
+      - sh
+      - -c
+      - until nc -z ${SIMSEARCH_HOST} ${SIMSEARCH_PORT} > /dev/null; do echo 'Waiting
+        for milvus.'; sleep 2; done;
+      env:
+      - name: SIMSEARCH_HOST
+        value: $egress.milvus.address
+      - name: SIMSEARCH_PORT
+        value: $egress.milvus.port
+      image: busybox:stable
+      imagePullPolicy: IfNotPresent
+      name: check-milvus-is-up
+    - args:
+      - ' python3 check_coll.pyc '
+      command:
+      - sh
+      - -c
+      env:
+      - name: SIMSEARCH_HOST
+        value: $egress.milvus.address
+      - name: SIMSEARCH_PORT
+        value: $egress.milvus.port
+      - name: SIMSEARCH_COLL_NAME
+        value: test_collection
+      - name: LOG_FILE
+        value: /opt/storage/logs
+      image: nvcr.io/nfgnkvuikvjm/mdx-v1_0/fsl-similaritysearch:1.0
+      imagePullPolicy: Always
+      name: check-milvus-collection
+    securityContext:
+      runAsGroup: 1000
+      runAsUser: 1000
+    volumes:
+    - name: input-storage
+      persistentVolumeClaim:
+        claimName: fsl-flaskcontroller-local-storage-pvc
+    - name: local-storage
+      persistentVolumeClaim:
+        claimName: fsl-embeddinggeneration-local-storage-pvc
+batchSize: '128'
+defaultVolumeMounts:
+- mountPath: /opt/storage
+  name: local-storage
+- mountPath: /opt/workload-config
+  name: workload-cm-volume
+- mountPath: /opt/configs
+  name: configs-volume
+- mountPath: /opt/scripts
+  name: scripts-cm-volume
+defaultVolumes:
+- configMap:
+    name: fsl-embeddinggeneration-workload-cm
+  name: workload-cm-volume
+- configMap:
+    name: fsl-embeddinggeneration-configs-cm
+  name: configs-volume
+- configMap:
+    name: fsl-embeddinggeneration-scripts-cm
+  name: scripts-cm-volume
+downloadRetries: '5'
+egress:
+  flask:
+    address: <PLACEHOLDER>
+    port: 0
+  milvus:
+    address: <PLACEHOLDER>
+    port: 0
+  mongodb:
+    address: <PLACEHOLDER>
+    port: 0
+  redis:
+    address: <PLACEHOLDER>
+    port: 0
+embedderModelKey: nvidia_tlt
+embedderName: retailEmbedder.etlt
+embedderUrl: nfgnkvuikvjm/mdx-v1_0/retail_embedder:1
+embeddingDims: '2048'
+image:
+  pullPolicy: IfNotPresent
+imagePullSecrets: []
+ingress:
+  enabled: false
+logLevel: '0'
+nodeSelector: {}
+podAnnotations: {}
+podSecurityContext: {}
+replicaCount: 1
+resources: {}
+securityContext: {}
+storageClaims:
+  local-storage:
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: 5Gi
+      storageClassName: mdx-local-path
+tolerations: []
+workloadSpecs:
+  dummy: {}
+
+
+
+configs:
+  config.yaml:
+    SampleConfig:
+      sampleValue: 0
+

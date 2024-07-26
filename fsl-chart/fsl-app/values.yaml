@@ -1,0 +1,728 @@
+global: {}
+metropolis-perception:
+  applicationSpecs:
+    metropolis-perception:
+      containers:
+        ucf-metropolis-perception-container:
+          env:
+          - name: TEST_MODE
+            value: '0'
+          - name: APP_TYPE
+            value: fsl
+          - name: BROKER_TYPE
+            value: redis
+          - name: LOG_LEVEL
+            value: '5'
+          - name: LOG_FILE
+            value: /opt/storage/
+          - name: BROKER_HOST
+            value: redis-redis-svc
+          - name: BROKER_PORT
+            value: '6379'
+          - name: BROKER_CHANNEL
+            value: test
+          - name: CONTROLLER_TOPIC
+            value: system_config
+      initContainers:
+      - args:
+        - until nc -zv -w 2 $(BROKER_ENDPOINT) $(BROKER_PORT); do echo 'Waiting for
+          broker services to be up'; done
+        command:
+        - sh
+        - -c
+        env:
+        - name: BROKER_ENDPOINT
+          value: redis-redis-svc
+        - name: BROKER_PORT
+          value: '6379'
+        image: busybox:stable
+        imagePullPolicy: IfNotPresent
+        name: check-broker-up
+      - args:
+        - "bash /app/scripts/download_data.sh; echo 'Building engine'; rm -rf ~/.cache/gstreamer-1.0;\
+          \ bash /app/scripts/start.sh; echo 'Engine built'; "
+        command:
+        - sh
+        - -c
+        env:
+        - name: NGC_CLI_API_KEY
+          valueFrom:
+            secretKeyRef:
+              key: NGC_CLI_API_KEY
+              name: ngc-api-key-secret
+              optional: false
+        - name: APP_TYPE
+          value: fsl
+        - name: TEST_MODE
+          value: '1'
+        - name: DETECTOR_URL
+          value: nfgnkvuikvjm/mdx-v1_0/retail_detector:1
+        - name: DETECTOR_NAME
+          value: efficientdet_v0.2.etlt
+        - name: EMBEDDER_URL
+          value: nfgnkvuikvjm/mdx-v1_0/retail_embedder:1
+        - name: EMBEDDER_NAME
+          value: retailEmbedder.etlt
+        - name: LOG_LEVEL
+          value: '5'
+        - name: NUM_RETRIES
+          value: '5'
+        image: nvcr.io/nfgnkvuikvjm/mdx-v1_0/mdx-perception:1.0
+        imagePullPolicy: Always
+        name: prepare-data
+  imagePullSecrets:
+  - name: ngc-docker-reg-secret
+vms:
+  applicationSpecs:
+    vms:
+      containers:
+        vms-container:
+          env:
+          - name: REDIS_SVC_SERVICE_HOST
+            value: redis-redis-svc
+          - name: REDIS_SVC_SERVICE_PORT
+            value: '6379'
+          image:
+            repository: nvcr.io/rxczgrvsg8nx/vst-1-0/vst
+            tag: v1.1.35_x86_64
+      initContainers:
+      - args:
+        - until ! [[ "6379" =~ ^[1-9] ]] || curl --connect-timeout 1 redis-redis-svc:6379
+          2>&1 | grep 'Empty reply from server' >/dev/null; do echo "Waiting for redis";
+          done
+        command:
+        - sh
+        - -c
+        image: curlimages/curl:7.83.1
+        imagePullPolicy: IfNotPresent
+        name: check-redis-up
+      services:
+        svc:
+          ports:
+          - name: vms
+            nodePort: 30000
+            port: 30000
+            protocol: TCP
+          - name: rtsp
+            nodePort: 30554
+            port: 30554
+            protocol: TCP
+          - name: rtsp-in
+            nodePort: 30001
+            port: 30001
+            protocol: UDP
+            range: 30
+          - name: udp-video-in
+            nodePort: 30031
+            port: 30031
+            protocol: UDP
+          - name: udp-audio-in
+            nodePort: 30032
+            port: 30032
+            protocol: UDP
+  imagePullSecrets:
+  - name: ngc-docker-reg-secret
+
+
+
+  configs:
+    vst_config.json:
+      data:
+        total_video_storage_size_MB: 100000
+      network:
+        coturn_turnurl_list_with_secret:
+        grpc_server_port: 50051
+        ntp_servers:
+        stunurl_list:
+        - stun.l.google.com:19302
+        - stun1.l.google.com:19302
+          # List of turnUrls with static credentials. Example - admin:admin@10.0.0.1:3478
+          #static_turnurl_list:
+          #  - coturn-admin:Uq3CFRYKr6rFVFcc@15.206.12.240:3478
+          # List of coturn turnUrls with secret. Example - 10.0.0.1:3478:secret_key
+        twilio_account_sid:
+        twilio_auth_token:
+      notifications:
+        enable_notification: false
+  egress:
+    redis:
+      address: redis-redis-svc
+      port: 6379
+redis:
+  imagePullSecrets:
+  - name: ngc-docker-reg-secret
+  storageClaims:
+    data:
+      spec:
+        storageClassName: mdx-local-path
+fsl-similaritysearch:
+  applicationSpecs:
+    fsl-similaritysearch-deployment:
+      containers:
+        fsl-similaritysearch-container:
+          env:
+          - name: SIMSEARCH_HOST
+            value: milvus-db-app-svc
+          - name: SIMSEARCH_PORT
+            value: '19530'
+          - name: SIMSEARCH_COLL_NAME
+            value: test_collection
+          - name: KILL_ALL_PREVIOUS
+            value: '1'
+          - name: MESSAGE_HOST
+            value: redis-redis-svc
+          - name: MESSAGE_PORT
+            value: '6379'
+          - name: LOG_FILE
+            value: /opt/storage/
+          - name: LOG_LEVEL
+            value: '0'
+          - name: SINGLE_BOX
+            value: '1'
+          - name: PROTOBUF
+            value: '1'
+          - name: MAX_QUEUE_SIZE
+            value: '10'
+      initContainers:
+      - args:
+        - until curl --connect-timeout 1 redis-redis-svc:6379 2>&1 | grep 'Empty reply
+          from server' >/dev/null; do echo "Waiting for redis"; done
+        command:
+        - sh
+        - -c
+        image: curlimages/curl:7.83.1
+        imagePullPolicy: IfNotPresent
+        name: check-redis-up
+      - command:
+        - sh
+        - -c
+        - until nc -z ${SIMSEARCH_HOST} ${SIMSEARCH_PORT} > /dev/null; do echo 'Waiting
+          for milvus.'; sleep 2; done;
+        env:
+        - name: SIMSEARCH_HOST
+          value: milvus-db-app-svc
+        - name: SIMSEARCH_PORT
+          value: '19530'
+        image: busybox:stable
+        imagePullPolicy: IfNotPresent
+        name: check-milvus-is-up
+  imagePullSecrets:
+  - name: ngc-docker-reg-secret
+  egress:
+    redis:
+      address: redis-redis-svc
+      port: 6379
+    flask:
+      address: fsl-flaskcontroller-fsl-flaskcontroller-svc
+      port: 8080
+    milvus:
+      address: milvus-db-app-svc
+      port: 19530
+fsl-flaskcontroller:
+  applicationSpecs:
+    fsl-flaskcontroller:
+      containers:
+        fsl-flaskcontroller-container:
+          env:
+          - name: LOG_FILE
+            value: /opt/logs
+          - name: LOG_LEVEL
+            value: '0'
+          - name: MESSAGE_HOST
+            value: redis-redis-svc
+          - name: MESSAGE_PORT
+            value: '6379'
+          - name: SIMSEARCH_HOST
+            value: milvus-db-app-svc
+          - name: SIMSEARCH_PORT
+            value: '19530'
+          - name: SIMSEARCH_COLL_NAME
+            value: test_collection
+          - name: DB_HOST
+            value: mongodb-mongodb-svc
+          - name: DB_PORT
+            value: '27017'
+          - name: VMS_HOST
+            value: vms-vms-svc
+          - name: VMS_PORT
+            value: '30000'
+          - name: VMS_RTSP_PORT
+            value: '30554'
+          - name: ESK_HOST
+            value: mdx-elasticsearch-cluster-master
+          - name: ESK_PORT
+            value: '9200'
+      initContainers:
+      - args:
+        - until curl --connect-timeout 5 $(VMS_ENDPOINT)/api/getLiveStreamUriList;
+          do echo "Waiting for VMS"; done
+        command:
+        - sh
+        - -c
+        env:
+        - name: VMS_ENDPOINT
+          value: vms-vms-svc:30000
+        image: curlimages/curl:7.83.1
+        name: check-vms-up
+      - command:
+        - sh
+        - -c
+        - until nc -z ${SIMSEARCH_HOST} ${SIMSEARCH_PORT} > /dev/null; do echo 'Waiting
+          for milvus.'; sleep 2; done;
+        env:
+        - name: SIMSEARCH_HOST
+          value: milvus-db-app-svc
+        - name: SIMSEARCH_PORT
+          value: '19530'
+        image: busybox:stable
+        imagePullPolicy: IfNotPresent
+        name: check-milvus-is-up
+  imagePullSecrets:
+  - name: ngc-docker-reg-secret
+  egress:
+    vms:
+      address: vms-vms-svc
+      port: 30000
+    mongodb:
+      address: mongodb-mongodb-svc
+      port: 27017
+    redis:
+      address: redis-redis-svc
+      port: 6379
+    esk:
+      address: mdx-elasticsearch-cluster-master
+      port: 9200
+    milvus:
+      address: milvus-db-app-svc
+      port: 19530
+fsl-modelassessor:
+  applicationSpecs:
+    fsl-modelassessor-deployment:
+      containers:
+        fsl-modelassessor-container:
+          env:
+          - name: LOG_LEVEL
+            value: '0'
+          - name: LOG_FILE
+            value: /tmp
+          - name: DB_HOST
+            value: mongodb-mongodb-svc
+          - name: DB_PORT
+            value: '27017'
+          - name: ESK_HOST
+            value: mdx-elasticsearch-cluster-master
+          - name: ESK_PORT
+            value: '9200'
+          - name: TIME
+            value: '1'
+      initContainers:
+      - args:
+        - until nc -z mdx-elasticsearch-cluster-master 9200 > /dev/null; do echo Waiting
+          for master.; sleep 2; done;
+        command:
+        - sh
+        - -c
+        image: busybox:stable
+        name: fsl-modelassessor-pre
+      - args:
+        - until nc -z mongodb-mongodb-svc 27017 > /dev/null; do echo Waiting for master.;
+          sleep 2; done;
+        command:
+        - sh
+        - -c
+        image: busybox:stable
+        name: fsl-modelassessor-pre2
+  imagePullSecrets:
+  - name: ngc-docker-reg-secret
+  egress:
+    mongodb:
+      address: mongodb-mongodb-svc
+      port: 27017
+    esk:
+      address: mdx-elasticsearch-cluster-master
+      port: 9200
+mongodb:
+  imagePullSecrets:
+  - name: ngc-docker-reg-secret
+fsl-embeddinggeneration:
+  applicationSpecs:
+    fsl-embeddinggeneration-deployment:
+      containers:
+        fsl-embeddinggeneration-container:
+          env:
+          - name: LOG_LEVEL
+            value: '0'
+          - name: LOG_FILE
+            value: /opt/storage/logs
+          - name: MESSAGE_HOST
+            value: redis-redis-svc
+          - name: MESSAGE_PORT
+            value: '6379'
+          - name: SIMSEARCH_HOST
+            value: milvus-db-app-svc
+          - name: SIMSEARCH_PORT
+            value: '19530'
+          - name: SIMSEARCH_COLL_NAME
+            value: test_collection
+          - name: DB_HOST
+            value: mongodb-mongodb-svc
+          - name: DB_PORT
+            value: '27017'
+          - name: MODEL_FILE
+            value: /opt/storage/models/embedder.onnx
+          - name: UNSEEN_DIR
+            value: /opt/feedback
+          - name: MESSAGE_CHANNEL
+            value: embedding_generation
+          - name: BIGDUMP_DIR
+            value: /opt/input
+          - name: BATCH_SIZE
+            value: '128'
+          - name: DIMS
+            value: '2048'
+      initContainers:
+      - args:
+        - until curl --connect-timeout 1 redis-redis-svc:6379 2>&1 | grep 'Empty reply
+          from server' >/dev/null; do echo "Waiting for redis"; done
+        command:
+        - sh
+        - -c
+        image: curlimages/curl:7.83.1
+        name: check-redis-up
+      - args:
+        - ' bash download_data.sh'
+        command:
+        - sh
+        - -c
+        env:
+        - name: NGC_CLI_API_KEY
+          valueFrom:
+            secretKeyRef:
+              key: NGC_CLI_API_KEY
+              name: ngc-api-key-secret
+              optional: false
+        - name: EMBEDDER_URL
+          value: nfgnkvuikvjm/mdx-v1_0/retail_embedder:1
+        - name: EMBEDDER_NAME
+          value: retailEmbedder.etlt
+        - name: EMBEDDER_MODEL_KEY
+          value: nvidia_tlt
+        - name: NUM_RETRIES
+          value: '5'
+        image: nvcr.io/nfgnkvuikvjm/mdx-v1_0/fsl-similaritysearch:1.0
+        imagePullPolicy: Always
+        name: prepare-data
+      - command:
+        - sh
+        - -c
+        - until nc -z ${SIMSEARCH_HOST} ${SIMSEARCH_PORT} > /dev/null; do echo 'Waiting
+          for milvus.'; sleep 2; done;
+        env:
+        - name: SIMSEARCH_HOST
+          value: milvus-db-app-svc
+        - name: SIMSEARCH_PORT
+          value: '19530'
+        image: busybox:stable
+        imagePullPolicy: IfNotPresent
+        name: check-milvus-is-up
+      - args:
+        - ' python3 check_coll.pyc '
+        command:
+        - sh
+        - -c
+        env:
+        - name: SIMSEARCH_HOST
+          value: milvus-db-app-svc
+        - name: SIMSEARCH_PORT
+          value: '19530'
+        - name: SIMSEARCH_COLL_NAME
+          value: test_collection
+        - name: LOG_FILE
+          value: /opt/storage/logs
+        image: nvcr.io/nfgnkvuikvjm/mdx-v1_0/fsl-similaritysearch:1.0
+        imagePullPolicy: Always
+        name: check-milvus-collection
+  imagePullSecrets:
+  - name: ngc-docker-reg-secret
+  egress:
+    redis:
+      address: redis-redis-svc
+      port: 6379
+    mongodb:
+      address: mongodb-mongodb-svc
+      port: 27017
+    flask:
+      address: fsl-flaskcontroller-fsl-flaskcontroller-svc
+      port: 8080
+    milvus:
+      address: milvus-db-app-svc
+      port: 19530
+logstash:
+  replicas: 4
+
+# Allows you to add any config files in /usr/share/logstash/config/
+# such as logstash.yml and log4j2.properties
+#
+# Note that when overriding logstash.yml, `http.host: 0.0.0.0` should always be included
+# to make default probes work.
+  logstashConfig:
+    logstash.yml: "http.host: \"0.0.0.0\"\nhttp.port: 9600\nxpack.monitoring.enabled:\
+      \ false\nqueue.type: \"memory\"\nqueue.checkpoint.writes: 1023\nconfig.reload.automatic:\
+      \ \"false\"\npipeline.batch.size: 999\npipeline.workers: 1\nlog.level: \"info\"\
+      \nconfig.debug: true\nmonitoring.enabled: false  "
+#  logstash.yml: |
+#    key:
+#      nestedkey: value
+#  log4j2.properties: |
+#    key = value
+
+# Allows you to add any pipeline files in /usr/share/logstash/pipeline/
+### ***warn*** there is a hardcoded logstash.conf in the image, override it first
+  logstashPipeline:
+    logstash.conf: "input {\n  kafka {\n    type => \"mdx-raw\"\n    consumer_threads\
+      \ => 4\n    topics => [\"mdx-raw\"]\n    decorate_events => true\n    auto_offset_reset\
+      \ => \"latest\"\n    group_id => \"logstash\"\n    key_deserializer_class =>\
+      \ \"org.apache.kafka.common.serialization.StringDeserializer\"\n    value_deserializer_class\
+      \ => \"org.apache.kafka.common.serialization.ByteArrayDeserializer\"\n    codec\
+      \ => protobuf\n    {\n      class_name => \"nv.Frame\"\n      class_file =>\
+      \ '/usr/share/logstash/pb_definitions/schema_pb.rb'\n      protobuf_root_directory\
+      \ => \"/usr/share/logstash/pb_definitions/\"\n      protobuf_version => 3\n\
+      \    }\n    bootstrap_servers => \"mdx-kafka-cluster-kafka-brokers:9092\"\n\
+      \  }\n  kafka {\n    type => \"mdx-behavior\"\n    consumer_threads => 4\n \
+      \   topics => [\"mdx-behavior\", \"mdx-behavior-plus\"]\n    decorate_events\
+      \ => true\n    auto_offset_reset => \"latest\"\n    group_id => \"logstash\"\
+      \n    key_deserializer_class => \"org.apache.kafka.common.serialization.StringDeserializer\"\
+      \n    value_deserializer_class => \"org.apache.kafka.common.serialization.ByteArrayDeserializer\"\
+      \n    codec => protobuf\n    {\n      class_name => \"nv.Behavior\"\n      class_file\
+      \ => '/usr/share/logstash/pb_definitions/ext_pb.rb'\n      protobuf_root_directory\
+      \ => \"/usr/share/logstash/pb_definitions/\"\n      protobuf_version => 3\n\
+      \    }\n    bootstrap_servers => \"mdx-kafka-cluster-kafka-brokers:9092\"\n\
+      \  }\n  kafka {\n    type => \"mdx-alerts\"\n    consumer_threads => 4\n   \
+      \ topics => [\"mdx-alerts\"]\n    auto_offset_reset => \"latest\"\n    decorate_events\
+      \ => true\n    group_id => \"logstash\"\n    key_deserializer_class => \"org.apache.kafka.common.serialization.StringDeserializer\"\
+      \n    value_deserializer_class => \"org.apache.kafka.common.serialization.ByteArrayDeserializer\"\
+      \n    codec => protobuf\n    {\n      class_name => \"nv.Behavior\"\n      class_file\
+      \ => '/usr/share/logstash/pb_definitions/ext_pb.rb'\n      protobuf_root_directory\
+      \ => \"/usr/share/logstash/pb_definitions/\"\n      protobuf_version => 3\n\
+      \    }\n    bootstrap_servers => \"mdx-kafka-cluster-kafka-brokers:9092\"\n\
+      \  }\n  kafka {\n    type => \"mdx-tripwire\"\n    consumer_threads => 4\n \
+      \   topics => [\"mdx-tripwire\"]\n    decorate_events => true\n    auto_offset_reset\
+      \ => \"latest\"\n    group_id => \"logstash\"\n    key_deserializer_class =>\
+      \ \"org.apache.kafka.common.serialization.StringDeserializer\"\n    value_deserializer_class\
+      \ => \"org.apache.kafka.common.serialization.ByteArrayDeserializer\"\n    codec\
+      \ => protobuf\n    {\n      class_name => \"nv.Behavior\"\n      class_file\
+      \ => '/usr/share/logstash/pb_definitions/ext_pb.rb'\n      protobuf_root_directory\
+      \ => \"/usr/share/logstash/pb_definitions/\"\n      protobuf_version => 3\n\
+      \    }\n    bootstrap_servers => \"mdx-kafka-cluster-kafka-brokers:9092\"\n\
+      \  }\n  kafka {\n    type => \"mdx-frames\"\n    consumer_threads => 4\n   \
+      \ topics => [\"mdx-frames\"]\n    decorate_events => true\n    auto_offset_reset\
+      \ => \"latest\"\n    group_id => \"logstash\"\n    key_deserializer_class =>\
+      \ \"org.apache.kafka.common.serialization.StringDeserializer\"\n    value_deserializer_class\
+      \ => \"org.apache.kafka.common.serialization.ByteArrayDeserializer\"\n    codec\
+      \ => protobuf\n    {\n      class_name => \"nv.FrameMessage\"\n      class_file\
+      \ => '/usr/share/logstash/pb_definitions/ext_pb.rb'\n      protobuf_root_directory\
+      \ => \"/usr/share/logstash/pb_definitions/\"\n      protobuf_version => 3\n\
+      \    }\n    bootstrap_servers => \"mdx-kafka-cluster-kafka-brokers:9092\"\n\
+      \  }\n  kafka {\n    type => \"mdx-mtmc\"\n    consumer_threads => 4\n    topics\
+      \ => [\"mdx-mtmc\"]\n    decorate_events => true\n    auto_offset_reset => \"\
+      latest\"\n    group_id => \"logstash\"\n    codec => \"plain\"\n    key_deserializer_class\
+      \ => \"org.apache.kafka.common.serialization.StringDeserializer\"\n    bootstrap_servers\
+      \ => \"mdx-kafka-cluster-kafka-brokers:9092\"\n  }\n}\nfilter {\n  json { source\
+      \ => \"message\" }\n  if [type] == \"mdx-raw\" or [type] == \"mdx-frames\" {\n\
+      \    ruby {\n      code => \"event.set('timestamp',(((event.get('[timestamp][seconds]').to_f)*1000)\
+      \ +((event.get('[timestamp][nanos]').to_f) * (10 ** -6)).floor()))\"\n    }\n\
+      \    date {\n      match => [ \"timestamp\",\"UNIX_MS\" ]\n      target => \"\
+      timestamp\"\n      timezone => \"UTC\"\n    }\n  }\n  else if [type] == \"mdx-behavior\"\
+      \ or [type] == \"mdx-tripwire\" or [type] == \"mdx-alerts\" {\n    mutate {\n\
+      \      remove_field => [\"embeddings\"]\n    }\n    ruby {\n      code => \"\
+      event.set('timestamp',(((event.get('[timestamp][seconds]').to_f)*1000) +((event.get('[timestamp][nanos]').to_f)\
+      \ * (10 ** -6)).floor()))\"\n    }\n    date {\n      match => [ \"timestamp\"\
+      ,\"UNIX_MS\" ]\n      target => \"timestamp\"\n      timezone => \"UTC\"\n \
+      \   }\n    ruby {\n      code => \"event.set('end',(((event.get('[end][seconds]').to_f)*1000)\
+      \ +((event.get('[end][nanos]').to_f) * (10 ** -6)).floor()))\"\n    }\n    date\
+      \ {\n      match => [ \"end\",\"UNIX_MS\" ]\n      target => \"end\"\n     \
+      \ timezone => \"UTC\"\n    }\n    ruby {\n      code => '\n        locations\
+      \ = []\n        currentLocations=event.get(\"locations\")\n        if currentLocations\n\
+      \          for location in currentLocations[\"coordinates\"] do\n          \
+      \  locations.append(location[\"point\"])\n          end\n          event.set(\"\
+      [locations][coordinates]\",locations)\n        end\n        smoothLocations\
+      \ = []\n        currentSmoothLocations=event.get(\"smoothLocations\")\n    \
+      \    if currentSmoothLocations\n          for smoothLocation in currentSmoothLocations[\"\
+      coordinates\"] do\n            smoothLocations.append(smoothLocation[\"point\"\
+      ])\n          end\n          event.set(\"[smoothLocations][coordinates]\",smoothLocations)\n\
+      \        end\n      '\n    }\n  }\n  if [type] == \"mdx-behavior\" or [type]\
+      \ == \"mdx-tripwire\" {\n    fingerprint {\n      method => \"SHA1\"\n     \
+      \ key => \"HMAC\"\n      source => [ \"timestamp\", \"[place][name]\", \"[sensor][id]\"\
+      , \"[object][id]\"]\n      concatenate_sources => true\n      target => \"Id\"\
+      \n    }\n  }\n  else if [type] == \"mdx-alerts\" {\n    fingerprint {\n    \
+      \  method => \"SHA1\"\n      key => \"HMAC\"\n      source => [ \"timestamp\"\
+      , \"[place][name]\", \"[sensor][id]\", \"[object][id]\", \"[analyticsModule][id]\"\
+      ]\n      concatenate_sources => true\n      target => \"Id\"\n    }\n  }\n \
+      \ else if [type] == \"mdx-mtmc\" {\n    fingerprint {\n      method => \"SHA1\"\
+      \n      key => \"HMAC\"\n      source => [ \"globalId\", \"timestamp\" ]\n \
+      \     concatenate_sources => true\n      target => \"Id\"\n    }\n  }\n  grok\
+      \ {\n    match => [\"timestamp\", \"%{YEAR:[@metadata][year]}-%{MONTHNUM:[@metadata][month]}-%{MONTHDAY:[@metadata][day]}T%{GREEDYDATA}\"\
+      ]\n  }\n  mutate {\n    remove_field => [\"kafka\", \"message\", \"@timestamp\"\
+      , \"@version\"]\n  }\n}\noutput {\n  if [type] == \"mdx-behavior\" or [type]\
+      \ == \"mdx-tripwire\" or [type] == \"mdx-alerts\" or [type] == \"mdx-mtmc\"\
+      \ {\n    elasticsearch {\n      hosts => \"mdx-elasticsearch-cluster-master-headless:9200\"\
+      \n      index => \"%{type}-%{[@metadata][year]}-%{[@metadata][month]}-%{[@metadata][day]}\"\
+      \n      document_type => \"logs\"\n      retry_max_interval => 10\n      action\
+      \ => \"index\"\n      document_id => \"%{Id}\"\n      timeout => 60\n    }\n\
+      \  }\n  else {\n    elasticsearch {\n      hosts => \"mdx-elasticsearch-cluster-master-headless:9200\"\
+      \n      index => \"%{type}-%{[@metadata][year]}-%{[@metadata][month]}-%{[@metadata][day]}\"\
+      \n      document_type => \"logs\"\n      retry_max_interval => 10\n      action\
+      \ => \"index\"\n      timeout => 60\n    }\n  }\n}              "
+
+  image: nvcr.io/nfgnkvuikvjm/mdx-v1_0/mdx-logstash
+  imageTag: '1.0'
+  imagePullSecrets:
+  - name: ngc-docker-reg-secret
+
+  logstashJavaOpts: -Xmx10g -Xms8g
+
+  resources:
+    requests:
+      cpu: 1000m
+      memory: 9900Mi
+    limits:
+      cpu: 6000m
+      memory: 11000Mi
+
+  antiAffinity: best effort
+
+# This is the node affinity settings as defined in
+# https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#node-affinity-beta-feature
+  HelmDependencies:
+    logstash:
+      logstashPipeline:
+        logstash.conf: "input {\n  kafka {\n    type => \"mdx-raw\"\n    consumer_threads\
+          \ => 23\n    topics => [\"mdx-raw\"]\n    decorate_events => true\n    auto_offset_reset\
+          \ => \"latest\"\n    group_id => \"logstash\"\n    codec => \"plain\"\n\
+          \    key_deserializer_class => \"org.apache.kafka.common.serialization.StringDeserializer\"\
+          \n    bootstrap_servers => \"mdx-kafka-cluster-kafka-brokers:9092\"\n  }\n\
+          \  kafka {\n    type => \"mdx-behavior\"\n    consumer_threads => 23\n \
+          \   topics => [\"mdx-behavior\", \"mdx-behavior-plus\"]\n    decorate_events\
+          \ => true\n    auto_offset_reset => \"latest\"\n    group_id => \"logstash\"\
+          \n    codec => \"plain\"\n    key_deserializer_class => \"org.apache.kafka.common.serialization.StringDeserializer\"\
+          \n    bootstrap_servers => \"mdx-kafka-cluster-kafka-brokers:9092\"\n  }\n\
+          \  kafka {\n    type => \"mdx-alerts\"\n    consumer_threads => 3\n    topics\
+          \ => [\"mdx-alerts\"]\n    auto_offset_reset => \"latest\"\n    decorate_events\
+          \ => true\n    group_id => \"logstash\"\n    codec => \"plain\"\n    key_deserializer_class\
+          \ => \"org.apache.kafka.common.serialization.StringDeserializer\"\n    bootstrap_servers\
+          \ => \"mdx-kafka-cluster-kafka-brokers:9092\"\n  }\n  kafka {\n    type\
+          \ => \"mdx-tripwire\"\n    consumer_threads => 3\n    topics => [\"mdx-tripwire\"\
+          ]\n    decorate_events => true\n    auto_offset_reset => \"latest\"\n  \
+          \  group_id => \"logstash\"\n    codec => \"plain\"\n    key_deserializer_class\
+          \ => \"org.apache.kafka.common.serialization.StringDeserializer\"\n    bootstrap_servers\
+          \ => \"mdx-kafka-cluster-kafka-brokers:9092\"\n  }\n  kafka {\n    type\
+          \ => \"mdx-frames\"\n    consumer_threads => 23\n    topics => [\"mdx-frames\"\
+          ]\n    decorate_events => true\n    auto_offset_reset => \"latest\"\n  \
+          \  group_id => \"logstash\"\n    codec => \"plain\"\n    key_deserializer_class\
+          \ => \"org.apache.kafka.common.serialization.StringDeserializer\"\n    bootstrap_servers\
+          \ => \"mdx-kafka-cluster-kafka-brokers:9092\"\n  }\n}\nfilter {\n  json\
+          \ { source => \"message\" }\n  if [type] == \"mdx-behavior\" or [type] ==\
+          \ \"mdx-tripwire\"{\n    fingerprint {\n      method => \"SHA1\"\n     \
+          \ key => \"HMAC\"\n      source => [ \"@timestamp\", \"[place][name]\",\
+          \ \"[sensor][id]\", \"[object][id]\"]\n      concatenate_sources => true\n\
+          \      target => \"Id\"\n    }\n  }\n  else if [type] == \"mdx-alerts\"\
+          \ {\n    fingerprint {\n      method => \"SHA1\"\n      key => \"HMAC\"\n\
+          \        source => [ \"@timestamp\", \"[place][name]\", \"[sensor][id]\"\
+          , \"[object][id]\", \"[analyticsModule][id]\"]\n        concatenate_sources\
+          \ => true\n      target => \"Id\"\n      }\n  }\ngrok {\n    match => [\"\
+          @timestamp\", \"%{YEAR:[@metadata][year]}-%{MONTHNUM:[@metadata][month]}-%{MONTHDAY:[@metadata][day]}T%{GREEDYDATA}\"\
+          ]\n  }\n  mutate {\n    remove_field => [\"kafka\", \"message\"]\n  }\n\
+          }\noutput {\n  if [type] == \"mdx-behavior\" or [type] == \"mdx-tripwire\"\
+          \ or [type] == \"mdx-alerts\"{\n    elasticsearch {\n      hosts => \"mdx-elasticsearch-cluster-master-headless:9200\"\
+          \n      index => \"%{type}-%{[@metadata][year]}-%{[@metadata][month]}-%{[@metadata][day]}\"\
+          \n      document_type => \"logs\"\n      retry_max_interval => 9\n     \
+          \ action => \"index\"\n      document_id => \"%{Id}\"\n      timeout =>\
+          \ 59\n    }\n  }\n  else {\n    elasticsearch {\n      hosts => \"mdx-elasticsearch-cluster-master-headless:9200\"\
+          \n      index => \"%{type}-%{[@metadata][year]}-%{[@metadata][month]}-%{[@metadata][day]}\"\
+          \n      document_type => \"logs\"\n      retry_max_interval => 9\n     \
+          \ action => \"index\"\n      timeout => 59\n    }\n  }\n}"
+  Component:
+    name: mdx-logstash
+    version: v1.0
+    app-version: 7.16.3
+    description: mdx logstash configs
+    helmUrlLocationPath: https://helm.ngc.nvidia.com/myorg/myteam/charts
+  config:
+    pipeline.batch.size: 1000
+    pipeline.workers: 2
+  egress:
+    elk:
+      address: mdx-elasticsearch-cluster-master
+      port: 9200
+    message_broker:
+      address: redis-redis-svc
+      port: 6379
+mdx-elasticsearch-kibana:
+  elasticsearch:
+    esJavaOpts: -Xmx4g -Xms4g -Dlog4j2.formatMsgNoLookups=true
+    volumeClaimTemplate:
+      resources:
+        requests:
+          storage: 1000Gi
+    resources:
+      requests:
+        cpu: 8000m
+        memory: 16Gi
+      limits:
+        cpu: 8000m
+        memory: 20Gi
+  kibana:
+    resources:
+      limits:
+        memory: 10Gi
+  elasticsearchImage: docker.elastic.co/elasticsearch/elasticsearch
+  elasticsearchImageTag: 7.16.3
+  elasticsearchEsJavaOpts: -Xmx4g -Xms4g -Dlog4j2.formatMsgNoLookups=true
+  kibanaServiceName: mdx-elasticsearch-kibana
+  imagePullSecrets:
+  - name: ngc-docker-reg-secret
+milvus:
+## Enable or disable Milvus Cluster mode
+  cluster:
+    enabled: false
+
+
+## Expose the Milvus service to be accessed from outside the cluster (LoadBalancer service).
+## or access it from within the cluster (ClusterIP service). Set the service type and the port to serve it.
+## ref: http://kubernetes.io/docs/user-guide/services/
+##
+  service:
+    name: milvus-db-app-svc
+  standalone:
+    persistence:
+      persistentVolumeClaim:
+        storageClass: mdx-local-path
+        reclaimPolicy: Retain
+  attu:
+    enabled: true
+    #  - secretName: chart-attu-tls
+    #    hosts:
+    #      - milvus-attu.local
+
+
+## Configuration values for the minio dependency
+## ref: https://github.com/minio/charts/blob/master/README.md
+##
+
+  minio:
+    mode: standalone
+    persistence:
+      storageClass: mdx-local-path
+      size: 25Gi
+
+      reclaimPolicy: Retain
+  etcd:
+    replicaCount: 1
+    persistence:
+      storageClass: mdx-local-path
+      reclaimPolicy: Retain
+  fullNameOverride: milvus-db
+  imagePullSecrets:
+  - name: ngc-docker-reg-secret
+
+

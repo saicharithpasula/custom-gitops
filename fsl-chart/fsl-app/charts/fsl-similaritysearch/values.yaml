@@ -1,0 +1,162 @@
+Component:
+  app-version: 0.3.14
+  description: microservice for fsl similarity search
+  helmUrlLocationPath: https://helm.ngc.nvidia.com/myorg/myteam/charts
+  name: fsl-similaritysearch
+  version: 0.3.14
+affinity: {}
+applicationSpecs:
+  fsl-similaritysearch-deployment:
+    apptype: stateless
+    containers:
+      fsl-similaritysearch-container:
+        args:
+        - ' python3 setup_milvus2.pyc; python3 consumer.pyc; '
+        command:
+        - sh
+        - -c
+        env:
+        - name: SIMSEARCH_HOST
+          value: $egress.milvus.address
+        - name: SIMSEARCH_PORT
+          value: $egress.milvus.port
+        - name: SIMSEARCH_COLL_NAME
+          value: test_collection
+        - name: KILL_ALL_PREVIOUS
+          value: '1'
+        - name: MESSAGE_HOST
+          value: $egress.redis.address
+        - name: MESSAGE_PORT
+          value: $egress.redis.port
+        - name: LOG_FILE
+          value: /opt/storage/
+        - name: LOG_LEVEL
+          value: $params.logLevel
+        - name: SINGLE_BOX
+          value: $params.singleBox
+        - name: PROTOBUF
+          value: $params.protobuf
+        - name: MAX_QUEUE_SIZE
+          value: $params.maxQueueSize
+        image:
+          pullPolicy: Always
+          repository: nvcr.io/nfgnkvuikvjm/mdx-v1_0/fsl-similaritysearch
+          tag: '1.0'
+        livenessProbe:
+          exec:
+            command:
+            - echo
+            - TODO livenessProbe
+          initialDelaySeconds: 10
+          periodSeconds: 5
+        readinessProbe:
+          exec:
+            command:
+            - echo
+            - TODO readinessProbe
+          initialDelaySeconds: 10
+          periodSeconds: 5
+        startupProbe:
+          exec:
+            command:
+            - echo
+            - TODO startupProbe
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        volumeMounts:
+        - mountPath: /opt/storage
+          name: local-storage
+    initContainers:
+    - args:
+      - until curl --connect-timeout 1 $egress.redis.address:$egress.redis.port 2>&1
+        | grep 'Empty reply from server' >/dev/null; do echo "Waiting for redis";
+        done
+      command:
+      - sh
+      - -c
+      image: curlimages/curl:7.83.1
+      imagePullPolicy: IfNotPresent
+      name: check-redis-up
+    - command:
+      - sh
+      - -c
+      - until nc -z ${SIMSEARCH_HOST} ${SIMSEARCH_PORT} > /dev/null; do echo 'Waiting
+        for milvus.'; sleep 2; done;
+      env:
+      - name: SIMSEARCH_HOST
+        value: $egress.milvus.address
+      - name: SIMSEARCH_PORT
+        value: $egress.milvus.port
+      image: busybox:stable
+      imagePullPolicy: IfNotPresent
+      name: check-milvus-is-up
+    restartPolicy: Always
+    securityContext:
+      runAsGroup: 1000
+      runAsUser: 1000
+    volumes:
+    - name: local-storage
+      persistentVolumeClaim:
+        claimName: fsl-similaritysearch-local-storage-pvc
+defaultVolumeMounts:
+- mountPath: /opt/workload-config
+  name: workload-cm-volume
+- mountPath: /opt/configs
+  name: configs-volume
+- mountPath: /opt/scripts
+  name: scripts-cm-volume
+defaultVolumes:
+- configMap:
+    name: fsl-similaritysearch-workload-cm
+  name: workload-cm-volume
+- configMap:
+    name: fsl-similaritysearch-configs-cm
+  name: configs-volume
+- configMap:
+    name: fsl-similaritysearch-scripts-cm
+  name: scripts-cm-volume
+egress:
+  flask:
+    address: <PLACEHOLDER>
+    port: 0
+  milvus:
+    address: <PLACEHOLDER>
+    port: 0
+  redis:
+    address: <PLACEHOLDER>
+    port: 0
+image:
+  pullPolicy: IfNotPresent
+imagePullSecrets: []
+ingress:
+  enabled: false
+logLevel: '0'
+maxQueueSize: '10'
+nodeSelector: {}
+podAnnotations: {}
+podSecurityContext: {}
+protobuf: '1'
+replicaCount: 1
+resources: {}
+securityContext: {}
+singleBox: '1'
+storageClaims:
+  local-storage:
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: 5Gi
+      storageClassName: mdx-local-path
+tolerations: []
+workloadSpecs:
+  dummy: {}
+
+
+
+configs:
+  config.yaml:
+    SampleConfig:
+      sampleValue: 0
+

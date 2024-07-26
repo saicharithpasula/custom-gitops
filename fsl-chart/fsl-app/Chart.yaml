@@ -1,0 +1,39 @@
+apiVersion: v2
+dependencies:
+- name: metropolis-perception
+  repository: ""
+  version: 0.2.13
+- name: vms
+  repository: ""
+  version: 1.1.35
+- name: redis
+  repository: ""
+  version: 0.0.6
+- name: fsl-similaritysearch
+  repository: ""
+  version: 0.3.14
+- name: fsl-flaskcontroller
+  repository: ""
+  version: 0.2.18
+- name: fsl-modelassessor
+  repository: ""
+  version: 0.2.14
+- name: mongodb
+  repository: ""
+  version: 0.0.3
+- name: fsl-embeddinggeneration
+  repository: ""
+  version: 0.3.20
+- name: logstash
+  repository: ""
+  version: 1.0.0
+- name: mdx-elasticsearch-kibana
+  repository: ""
+  version: 1.0.0
+- name: milvus
+  repository: ""
+  version: 0.0.1
+description: FSL application
+name: fsl-app
+type: application
+version: 0.2.2

@@ -1,0 +1,127 @@
+Component:
+  app-version: 0.2.14
+  description: model assessor component for fsl
+  helmUrlLocationPath: https://helm.ngc.nvidia.com/myorg/myteam/charts
+  name: fsl-modelassessor
+  version: 0.2.14
+affinity: {}
+applicationSpecs:
+  fsl-modelassessor-deployment:
+    apptype: stateless
+    containers:
+      fsl-modelassessor-container:
+        args:
+        - ' python3 main.pyc'
+        command:
+        - sh
+        - -c
+        env:
+        - name: LOG_LEVEL
+          value: $params.logLevel
+        - name: LOG_FILE
+          value: /tmp
+        - name: DB_HOST
+          value: $egress.mongodb.address
+        - name: DB_PORT
+          value: $egress.mongodb.port
+        - name: ESK_HOST
+          value: $egress.esk.address
+        - name: ESK_PORT
+          value: $egress.esk.port
+        - name: TIME
+          value: $params.time
+        image:
+          pullPolicy: Always
+          repository: nvcr.io/nfgnkvuikvjm/mdx-v1_0/fsl-modelassessor
+          tag: '1.0'
+        livenessProbe:
+          exec:
+            command:
+            - echo
+            - TODO livenessProbe
+          initialDelaySeconds: 10
+          periodSeconds: 5
+        readinessProbe:
+          exec:
+            command:
+            - echo
+            - TODO readinessProbe
+          initialDelaySeconds: 10
+          periodSeconds: 5
+        startupProbe:
+          exec:
+            command:
+            - echo
+            - TODO startupProbe
+          initialDelaySeconds: 30
+          periodSeconds: 10
+    initContainers:
+    - args:
+      - until nc -z $egress.esk.address $egress.esk.port > /dev/null; do echo Waiting
+        for master.; sleep 2; done;
+      command:
+      - sh
+      - -c
+      image: busybox:stable
+      name: fsl-modelassessor-pre
+    - args:
+      - until nc -z $egress.mongodb.address $egress.mongodb.port > /dev/null; do echo
+        Waiting for master.; sleep 2; done;
+      command:
+      - sh
+      - -c
+      image: busybox:stable
+      name: fsl-modelassessor-pre2
+    restartPolicy: Always
+    securityContext:
+      runAsGroup: 1000
+      runAsUser: 1000
+defaultVolumeMounts:
+- mountPath: /opt/workload-config
+  name: workload-cm-volume
+- mountPath: /opt/configs
+  name: configs-volume
+- mountPath: /opt/scripts
+  name: scripts-cm-volume
+defaultVolumes:
+- configMap:
+    name: fsl-modelassessor-workload-cm
+  name: workload-cm-volume
+- configMap:
+    name: fsl-modelassessor-configs-cm
+  name: configs-volume
+- configMap:
+    name: fsl-modelassessor-scripts-cm
+  name: scripts-cm-volume
+egress:
+  esk:
+    address: <PLACEHOLDER>
+    port: 0
+  mongodb:
+    address: <PLACEHOLDER>
+    port: 0
+image:
+  pullPolicy: IfNotPresent
+imagePullSecrets: []
+ingress:
+  enabled: false
+logLevel: '0'
+nodeSelector: {}
+podAnnotations: {}
+podSecurityContext: {}
+replicaCount: 1
+resources: {}
+securityContext: {}
+storageClaims: {}
+time: '1'
+tolerations: []
+workloadSpecs:
+  dummy: {}
+
+
+
+configs:
+  config.yaml:
+    SampleConfig:
+      sampleValue: 0
+

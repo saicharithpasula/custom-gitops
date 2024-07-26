@@ -1,0 +1,6 @@
+apiVersion: v2
+appVersion: 0.2.13
+description: DS Perception service for MDX - MTMC & FSL
+name: metropolis-perception
+type: application
+version: 0.2.13

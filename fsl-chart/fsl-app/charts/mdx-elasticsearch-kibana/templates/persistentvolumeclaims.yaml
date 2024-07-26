@@ -1,0 +1,32 @@
+{{- $chart := .Chart -}}
+{{- $topValues := .Values }}
+{{- $defaultStorageClass := $topValues.storageClass -}}
+{{- $pvcs := $topValues.defaultVolumeMounts }}
+
+{{- range $pvc := $pvcs }}
+{{- if $pvc.claimInfo }}
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: {{ $.Chart.Name }}-{{ $pvc.name }}-pvc
+  labels:
+    name: {{ $.Chart.Name }}-{{ $pvc.name }}-pvc
+spec:
+  {{- if $pvc.claimInfo.storage }}
+  resources:
+    requests:
+      storage: {{ $pvc.claimInfo.storage }}
+  {{- end }}
+  accessModes: {{- range $pvc.claimInfo.accessModes }}
+  - {{.}}{{- end }}
+  {{- if $pvc.claimInfo.storageClass }}
+  storageClassName:  {{ $pvc.claimInfo.storageClass }}
+  {{- else if $defaultStorageClass }}
+  storageClassName: {{ $defaultStorageClass }}
+  {{- end }}
+  selector: 
+    matchLabels: 
+      volume-name: {{ $.Chart.Name }}-{{ $pvc.name }}-pv
+---
+{{- end }}
+{{- end }}

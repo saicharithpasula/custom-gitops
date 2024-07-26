@@ -1,0 +1,114 @@
+{{- $topValues := .Values }}
+{{- if $topValues.applicationSpecs }}
+{{- $applicationSpecs := $topValues.applicationSpecs }}
+{{- range $appname, $appData := $applicationSpecs }}
+{{if eq $appData.apptype "stateless" }}
+{{- $containers := $appData.containers }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ $.Chart.Name }}-{{ $appname }}
+  labels:
+    app: {{ $.Chart.Name }}-{{ $appname }}
+spec:
+  {{- if $appData.replicas }}
+  replicas: {{ $appData.replicas }}
+  {{- else if $topValues.replicas }}
+  replicas: {{ $topValues.replicas }}
+  {{- end }}
+  selector:
+    matchLabels:
+      app: {{ $appname }}
+  template:
+    metadata:
+      labels:
+        app: {{ $appname}}
+    spec:
+      {{- with $appData.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with $appData.initContainers }}
+      initContainers:
+      {{- range $appData.initContainers }}
+      - {{- toYaml . | nindent 8 }} 
+        volumeMounts:
+        {{- if $topValues.defaultVolumeMounts }}
+        {{- range $mount := $topValues.defaultVolumeMounts }}
+          - name: {{ $mount.name }}
+            mountPath: {{ $mount.mountPath }}
+        {{- end }}
+        {{- end }}
+        {{- if $appData.volumeMounts }}
+          {{- toYaml $appData.volumeMounts |  nindent 10 }}
+        {{- end }}
+      {{- end }}
+      {{- end }}
+      containers:
+      {{- range $containerName, $container := $containers }}
+        - name: {{ $containerName }}
+          image: {{ $container.image.repository }}:{{ $container.image.tag }}
+          imagePullPolicy: {{ $container.image.pullPolicy }}
+          {{- if $container.command }}
+          command:
+            {{- toYaml $container.command |  nindent 12 }}
+          {{- end }}
+          {{- if $container.args }}
+          args:
+            {{- toYaml $container.args |  nindent 10 }}
+          {{- end }}
+          {{- if $container.env }}
+          env:
+          {{- toYaml $container.env | nindent 10 }}
+          {{- end }}
+          {{- if $container.resources  }}
+          resources:
+            {{- toYaml $container.resources | nindent 12 }}
+          {{- end }}
+          volumeMounts:
+          {{- if $topValues.defaultVolumeMounts }}
+          {{- range $mount := $topValues.defaultVolumeMounts }}
+            - name: {{ $mount.name }}
+              mountPath: {{ $mount.mountPath }}
+          {{- end }}
+          {{- end }}
+          {{- if $container.volumeMounts }}
+            {{- toYaml $container.volumeMounts |  nindent 12 }}
+          {{- end }}
+          {{- if $container.ports }}
+          ports:
+            {{- toYaml $container.ports | nindent 12 }}
+          {{- end }}
+      {{- end }}
+      {{- with $appData.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with $appData.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with $appData.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      volumes:
+      {{- if $appData.volumes }}
+        {{- toYaml $appData.volumes |  nindent 6 }}
+      {{- end }}
+      {{- if $topValues.defaultVolumes }}
+      {{- range $vol := $topValues.defaultVolumes }}
+      {{- if ( hasKey $vol "createPv" ) }}
+      {{- if $vol.createPv }}
+        - name: {{ $vol.name }}
+          persistentVolumeClaim:
+            claimName: {{ $.Chart.Name }}-{{ $vol.name }}-pvc
+      {{- end }}
+      {{- else }}
+        - {{ toYaml $vol | nindent 10 }}
+      {{- end }}
+      {{- end }}
+      {{- end }}
+{{- end }}
+{{- end }}
+{{- end }}

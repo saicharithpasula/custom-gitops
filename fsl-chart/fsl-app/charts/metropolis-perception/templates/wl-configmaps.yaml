@@ -1,0 +1,17 @@
+{{- with .Values.workloadSpecs }}
+{{- $wlSpec :=  . }}
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: {{ $.Chart.Name }}-workload-cm
+  labels:
+{{ include "hb.labels.standard" . | indent 4 }}
+{{- include "std-helm.labels" $ | nindent 4 }}
+data:
+{{- range $wl_key, $wl_value := $wlSpec }}
+  {{- with $wl_value.wl_data }}
+  {{$wl_key}}: |
+   {{- $wl_value.wl_data | default "" | nindent 4 }}
+  {{- end}}
+{{- end}}
+{{- end}}

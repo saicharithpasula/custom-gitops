@@ -1,0 +1,11 @@
+apiVersion: v2
+appVersion: "7"
+dependencies:
+- name: elasticsearch
+  repository: ""
+- name: kibana
+  repository: ""
+description: my test helm chart
+name: mdx-elasticsearch-kibana
+type: application
+version: "1.0"

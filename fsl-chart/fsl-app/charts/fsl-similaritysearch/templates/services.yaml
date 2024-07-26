@@ -1,0 +1,82 @@
+{{- $topValues := .Values }}
+{{- if $topValues.applicationSpecs }}
+{{- range $appName, $appData := $topValues.applicationSpecs }}
+{{- range $svcName, $svcData := $appData.services }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  {{- if $svcData.nameOverride }}
+  name: {{ $appName }}-{{ $svcName }}
+  {{- else if $svcData.fullNameOverride  }}
+  name: {{ $svcName }}
+  {{- else }}
+  name: {{ $.Chart.Name }}-{{ $appName }}-{{ $svcName }}
+  {{- end }}
+  labels:
+    app: {{ $.Chart.Name }}-{{ $appName }}
+{{ include "hb.labels.standard" . | indent 4 }}
+{{- include "std-helm.labels" $ | nindent 4 }}
+    {{- if $svcData.labels }}
+    {{- $svcData.labels | toYaml | nindent 4 }}
+    {{- end }}
+    {{- if $topValues.svcLabels }}
+    {{- $topValues.svcLabels | toYaml | nindent 4 }}
+    {{- end }}
+  {{- if or ($svcData.annotations) ($topValues.svcAnnotations) }}
+  annotations:
+    {{- if $svcData.annotations }}
+    {{- $svcData.annotations | toYaml | nindent 4 }}
+    {{- end }}
+    {{- if $topValues.svcAnnotations }}
+    {{- $topValues.svcAnnotations | toYaml | nindent 4 }}
+    {{- end }}
+  {{- end }}
+spec:
+  {{- if $svcData.extraSpecs }}
+  {{- $svcData.extraSpecs | toYaml | nindent 2}}
+  {{- end }}
+  {{- if eq $appData.apptype "statefull" }}
+  {{- if $svcData.clusterIP }}
+  {{- if eq $svcData.clusterIP "None" }}
+  clusterIP: None
+  {{- end }}
+  {{- end }}
+  {{- end }}
+  selector:
+    app: {{ $.Chart.Name }}-{{ $appName }}
+  {{- if $svcData.type }}
+  type: {{ $svcData.type }}
+  {{- end }}
+  ports:
+  {{- range $port := $svcData.ports }}
+  {{- if $port.range }}
+  {{- range (until (int $port.range)) }}
+  - port: {{ add $port.port . }}
+    {{- if $port.name }}
+    name: {{ $port.name }}-{{ . }}
+    {{- end }}
+    {{- if $port.targetPort }}
+    {{- if kindIs "string" $port.targetPort }}
+    targetPort: {{ $port.targetPort }}-{{ . }}
+    {{- else }}
+    targetPort: {{ add $port.targetPort . }}
+    {{- end }}
+    {{- end }}
+    {{- if $port.nodePort }}
+    nodePort: {{ add $port.nodePort . }}
+    {{- end }}
+    {{- if $port.protocol }}
+    protocol: {{ $port.protocol }}
+    {{- end }}
+  {{- end}}
+  {{- else }}
+  - {{- $port | toYaml | nindent 4 -}}
+  {{- end }}
+  {{- end }}
+  {{- if $svcData.externalTrafficPolicy }}
+  externalTrafficPolicy: {{ $svcData.externalTrafficPolicy }}
+  {{- end }}
+{{- end }}
+{{- end }}
+{{- end }}

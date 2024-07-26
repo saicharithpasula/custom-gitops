@@ -1,0 +1,1702 @@
+Component:
+  app-version: 0.2.13
+  description: DS Perception service for MDX - MTMC & FSL
+  helmUrlLocationPath: https://helm.ngc.nvidia.com/myorg/myteam/charts
+  name: metropolis-perception
+  version: 0.2.13
+affinity: {}
+applicationSpecs:
+  metropolis-perception:
+    apptype: stateless
+    containers:
+      ucf-metropolis-perception-container:
+        args:
+        - bash /app/scripts/start.sh
+        command:
+        - sh
+        - -c
+        env:
+        - name: TEST_MODE
+          value: '0'
+        - name: APP_TYPE
+          value: $params.applicationType
+        - name: BROKER_TYPE
+          value: $params.brokerType
+        - name: LOG_LEVEL
+          value: $params.logLevel
+        - name: LOG_FILE
+          value: $params.logLocation
+        - name: BROKER_HOST
+          value: $params.msgbrokerAddress
+        - name: BROKER_PORT
+          value: $params.msgbrokerPort
+        - name: BROKER_CHANNEL
+          value: $params.msgbrokerChannel
+        - name: CONTROLLER_TOPIC
+          value: $params.controllerTopic
+        image:
+          pullPolicy: Always
+          repository: nvcr.io/nfgnkvuikvjm/mdx-v1_0/mdx-perception
+          tag: '1.0'
+        livenessProbe:
+          exec:
+            command:
+            - echo
+            - TODO livenessProbe
+          initialDelaySeconds: 10
+          periodSeconds: 5
+        ports:
+        - containerPort: 9000
+          name: http
+        readinessProbe:
+          exec:
+            command:
+            - echo
+            - TODO readinessProbe
+          initialDelaySeconds: 10
+          periodSeconds: 5
+        startupProbe:
+          exec:
+            command:
+            - echo
+            - TODO startupProbe
+          initialDelaySeconds: 30
+          periodSeconds: 10
+    initContainers:
+    - args:
+      - until nc -zv -w 2 $(BROKER_ENDPOINT) $(BROKER_PORT); do echo 'Waiting for
+        broker services to be up'; done
+      command:
+      - sh
+      - -c
+      env:
+      - name: BROKER_ENDPOINT
+        value: $params.msgbrokerAddress
+      - name: BROKER_PORT
+        value: $params.msgbrokerPort
+      image: busybox:stable
+      imagePullPolicy: IfNotPresent
+      name: check-broker-up
+    - args:
+      - 'bash /app/scripts/download_data.sh; echo ''Building engine''; rm -rf ~/.cache/gstreamer-1.0;
+        bash /app/scripts/start.sh; echo ''Engine built''; '
+      command:
+      - sh
+      - -c
+      env:
+      - name: NGC_CLI_API_KEY
+        valueFrom:
+          secretKeyRef:
+            key: NGC_CLI_API_KEY
+            name: ngc-api-key-secret
+            optional: false
+      - name: APP_TYPE
+        value: $params.applicationType
+      - name: TEST_MODE
+        value: '1'
+      - name: DETECTOR_URL
+        value: $params.detectorUrl
+      - name: DETECTOR_NAME
+        value: $params.detectorName
+      - name: EMBEDDER_URL
+        value: $params.embedderUrl
+      - name: EMBEDDER_NAME
+        value: $params.embedderName
+      - name: LOG_LEVEL
+        value: $params.logLevel
+      - name: NUM_RETRIES
+        value: $params.downloadRetries
+      image: nvcr.io/nfgnkvuikvjm/mdx-v1_0/mdx-perception:1.0
+      imagePullPolicy: Always
+      name: prepare-data
+    restartPolicy: Always
+    securityContext:
+      runAsGroup: 1000
+      runAsUser: 1000
+    services:
+      svc:
+        ports:
+        - name: http
+          port: 9000
+          protocol: TCP
+          targetPort: 9000
+        type: ClusterIP
+    volumes:
+    - name: local-storage
+      persistentVolumeClaim:
+        claimName: metropolis-perception-local-storage-pvc
+applicationType: fsl
+brokerType: redis
+controllerTopic: system_config
+defaultVolumeMounts:
+- mountPath: /opt/storage
+  name: local-storage
+- mountPath: /opt/workload-config
+  name: workload-cm-volume
+- mountPath: /opt/configs
+  name: configs-volume
+- mountPath: /opt/scripts
+  name: scripts-cm-volume
+defaultVolumes:
+- configMap:
+    name: metropolis-perception-workload-cm
+  name: workload-cm-volume
+- configMap:
+    name: metropolis-perception-configs-cm
+  name: configs-volume
+- configMap:
+    name: metropolis-perception-scripts-cm
+  name: scripts-cm-volume
+detectorName: efficientdet_v0.2.etlt
+detectorUrl: nfgnkvuikvjm/mdx-v1_0/retail_detector:1
+downloadRetries: '5'
+egress: {}
+embedderName: retailEmbedder.etlt
+embedderUrl: nfgnkvuikvjm/mdx-v1_0/retail_embedder:1
+image:
+  pullPolicy: IfNotPresent
+imagePullSecrets: []
+ingress:
+  enabled: false
+logLevel: '5'
+logLocation: /opt/storage/
+msgbrokerAddress: redis-redis-svc
+msgbrokerChannel: test
+msgbrokerPort: '6379'
+nodeSelector: {}
+podAnnotations: {}
+podSecurityContext: {}
+replicaCount: 1
+resources: {}
+securityContext: {}
+storageClaims:
+  local-storage:
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: 5Gi
+      storageClassName: mdx-local-path
+tolerations: []
+workloadSpecs:
+  dummy: {}
+  workload:
+    wl_data: "deepstream-0:\n  source-0:\n    url: file:///opt/nvidia/deepstream/deepstream/samples/streams/sample_720p.h264\n\
+      \    enable: 1\n    type: 4\n    num-sources: 1\n    gpu-id: 0\n    cuda-memory-type:\
+      \ 1\n    nvbuf-memory-type: 0\n    latency: 300\n    rtsp-reconnect-interval-sec:\
+      \ 120\n    select-rtp-protocol: 4\n  sensor-0:\n    enable: 1\n    type: Camera\n\
+      \    id: HWY_20_AND_CENTURY__WB\n    location: 45.293701447;-75.8303914499;48.1557479338\n\
+      \    description: Aisle Camera\n    coordinate: 5.2;10.1;11.2\n  place-0:\n\
+      \    enable: 1\n    id: 0\n    type: intersection/road\n    name: HWY_20_AND_CENTURY__WB\n\
+      \    location: 30.32;-40.55;100.0\n    coordinate: 1.0;2.0;3.0\n    place-sub-field1:\
+      \ C_127_158\n    place-sub-field2: Lane 1\n    place-sub-field3: P1\n  analytics-0:\n\
+      \    enable: 1\n    id: XYZ_1\n    description: Vehicle Detection and License\
+      \ Plate Recognition\n    source: OpenALR\n    version: 1.0"
+    wl_resources:
+      limits:
+        cpu: 1000m
+        memory: 3500Mi
+        nvidia.com/gpu: 1
+      requests:
+        cpu: 250m
+        memory: 2000Mi
+    wl_units: 1
+
+
+
+configs:
+  cfg_kafka.txt:
+    message-broker:
+      partition-key: sensorId
+  config.yaml:
+    SampleConfig:
+      sampleValue: 0
+  fsl_config.properties:
+    application:
+      enable-perf-measurement: 1
+      perf-measurement-interval-sec: 5
+    message-consumer0:
+      config-file: /opt/nvidia/deepstream/deepstream/sources/libs/kafka_protocol_adaptor/cfg_kafka.txt
+      conn-str: <host>;<port>
+      enable: 0
+      proto-lib: /opt/nvidia/deepstream/deepstream/lib/libnvds_kafka_proto.so
+      subscribe-topic-list: <topic1>;<topic2>;<topicN>
+    message-converter:
+      enable: 0
+      msg-conv-config: /opt/nvidia/deepstream/deepstream/sources/apps/sample_apps/deepstream-test5/configs/dstest5_msgconv_sample_config.txt
+      msg-conv-payload-type: 0
+    osd:
+      border-width: 1
+      clock-color: 1;0;0;0
+      clock-text-size: 12
+      clock-x-offset: 800
+      clock-y-offset: 820
+      enable: 1
+      font: Arial
+      gpu-id: 0
+      nvbuf-memory-type: 0
+      show-clock: 0
+      text-bg-color: 0.3;0.3;0.3;1
+      text-color: 1;1;1;1;
+      text-size: 15
+    primary-gie:
+      batch-size: 1
+      config-file: /opt/configs/fsl_pgie_config.txt
+      enable: 1
+      gie-unique-id: 1
+      gpu-id: 0
+      interval: 0
+      labelfile-path: /opt/nvidia/deepstream/deepstream/sources/apps/sample_apps/deepstream-fewshot-learning-app/models/fsl/detector_labels.txt
+    secondary-gie0:
+      batch-size: 16
+      config-file: /opt/configs/fsl_sgie_config.txt
+      enable: 1
+      gie-unique-id: 2
+      gpu-id: 0
+      interval: 0
+      operate-on-gie-id: 1
+    sink0:
+      enable: 1
+      gpu-id: 0
+      nvbuf-memory-type: 0
+      source-id: 0
+      sync: 0
+      type: 1
+    sink1:
+      enable: 1
+      msg-broker-conn-str: redis-redis-svc;6379;test
+      msg-broker-proto-lib: /opt/nvidia/deepstream/deepstream/lib/libnvds_redis_proto.so
+      msg-conv-config: /opt/storage/dstest5_msgconv_sample_config.txt
+      msg-conv-frame-interval: 1
+      msg-conv-msg2p-new-api: 0
+      msg-conv-payload-type: 2
+      topic: test
+      type: 6
+    sink2:
+      bitrate: 2000000
+      codec: 3
+      container: 1
+      enable: 0
+      output-file: out.mp4
+      source-id: 0
+      sync: 1
+      type: 3
+    sourceTemplate:
+      enable: 1
+      gpu-id: 0
+      latency: 300
+      num-sources: 1
+      nvbuf-memory-type: 0
+      rtsp-reconnect-interval-sec: 120
+      select-rtp-protocol: 4
+      type: 2
+      uri: rtsp://url
+    streammux:
+      attach-sys-ts-as-ntp: 0
+      batch-size: 1
+      batched-push-timeout: 40000
+      enable-padding: 0
+      gpu-id: 0
+      height: 1080
+      live-source: 0
+      nvbuf-memory-type: 0
+      width: 1920
+    tests:
+      file-loop: 0
+    tiled-display:
+      columns: 1
+      enable: 1
+      gpu-id: 0
+      height: 720
+      nvbuf-memory-type: 0
+      rows: 1
+      width: 1280
+    tracker:
+      display-tracking-id: 1
+      enable: 1
+      enable-batch-process: 1
+      enable-past-frame: 1
+      gpu-id: 0
+      ll-config-file: /opt/nvidia/deepstream/deepstream/samples/configs/deepstream-app/config_tracker_NvDCF_perf.yml
+      ll-lib-file: /opt/nvidia/deepstream/deepstream/lib/libnvds_nvmultiobjecttracker.so
+      tracker-height: 384
+      tracker-width: 640
+  fsl_init_workload:
+    deepstream-0:
+      analytics-0:
+        description: FSL Demo Stream
+        enable: 1
+        id: MDX_Perception
+        source: OpenALR
+        version: 1.0
+      place-0:
+        coordinate: 1.0;2.0;3.0
+        enable: 1
+        id: 0
+        location: 30.32;-40.55;100.0
+        name: FSL Demo Stream
+        place-sub-field1: Demo
+        place-sub-field2: MDX
+        place-sub-field3: stream1
+        type: intersection/road
+      sensor-0:
+        coordinate: 5.2;10.1;11.2
+        description: FSL Demo Stream
+        enable: 1
+        id: stream1
+        location: 45.293701447;-75.8303914499;48.1557479338
+        type: Camera
+      source-0:
+        cuda-memory-type: 1
+        enable: 1
+        gpu-id: 0
+        latency: 300
+        num-sources: 1
+        nvbuf-memory-type: 0
+        rtsp-reconnect-interval-sec: 120
+        select-rtp-protocol: 4
+        type: 2
+        url: file:///opt/nvidia/deepstream/deepstream/samples/streams/sample_720p.jpg
+  fsl_msgconv_config.properties:
+    analyticsTemplate:
+      description: FSL Demo Stream
+      enable: 1
+      id: MDX_Perception
+      source: OpenALR
+      version: 1.0
+    placeTemplate:
+      coordinate: 1.0;2.0;3.0
+      enable: 1
+      id: 0
+      location: 30.32;-40.55;100.0
+      name: FSL Demo Stream
+      place-sub-field1: Demo
+      place-sub-field2: MDX
+      place-sub-field3: stream1
+      type: intersection/road
+    sensorTemplate:
+      coordinate: 5.2;10.1;11.2
+      description: FSL Demo Stream
+      enable: 1
+      id: stream1
+      location: 45.293701447;-75.8303914499;48.1557479338
+      type: Camera
+  fsl_pgie_config.txt:
+    class-attrs-all:
+      detected-max-h: 0
+      detected-max-w: 0
+      detected-min-h: 10
+      detected-min-w: 10
+      pre-cluster-threshold: 0.7
+      roi-bottom-offset: 0
+      roi-top-offset: 0
+      threshold: 0.7
+    property:
+      batch-size: 1
+      cluster-mode: 3
+      custom-lib-path: /opt/nvidia/deepstream/deepstream/sources/apps/sample_apps/deepstream-fewshot-learning-app/custom_parser/libnvds_infercustomparser_tao.so
+      gie-unique-id: 1
+      gpu-id: 0
+      infer-dims: 3;416;416
+      interval: 0
+      labelfile-path: /opt/nvidia/deepstream/deepstream/sources/apps/sample_apps/deepstream-fewshot-learning-app/models/fsl/detector_labels.txt
+      maintain-aspect-ratio: 1
+      model-color-format: 1
+      model-engine-file: /opt/storage/detector.etlt_b1_gpu0_fp16.engine
+      net-scale-factor: 1.0
+      network-input-order: 1
+      network-mode: 2
+      num-detected-classes: 1
+      offsets: 0;0;0
+      output-blob-names: num_detections;detection_boxes;detection_scores;detection_classes
+      parse-bbox-func-name: NvDsInferParseCustomEfficientDetTAO
+      tlt-encoded-model: /opt/storage/detector.etlt
+      tlt-model-key: nvidia_tlt
+      uff-input-blob-name: image_arrays
+  fsl_sgie_config.txt:
+    property:
+      batch-size: 16
+      classifier-threshold: 0.0
+      gie-unique-id: 3
+      gpu-id: 0
+      infer-dims: 3;224;224
+      interval: 0
+      maintain-aspect-ratio: 0
+      model-color-format: 0
+      model-engine-file: /opt/storage/embedder.etlt_b16_gpu0_fp16.engine
+      net-scale-factor: 0.01735207357
+      network-mode: 2
+      network-type: 100
+      offsets: 123.657;116.28;103.53
+      operate-on-class-ids: 0;1;2;3
+      operate-on-gie-id: 1
+      output-tensor-meta: 1
+      process-mode: 2
+      tlt-encoded-model: /opt/storage/embedder.etlt
+      tlt-model-key: nvidia_tlt
+  mtmc_config.properties:
+    application:
+      enable-perf-measurement: 1
+      perf-measurement-interval-sec: 5
+    message-consumer0:
+      config-file: /opt/nvidia/deepstream/deepstream/sources/libs/kafka_protocol_adaptor/cfg_kafka.txt
+      conn-str: <host>;<port>
+      enable: 0
+      proto-lib: /opt/nvidia/deepstream/deepstream/lib/libnvds_kafka_proto.so
+      subscribe-topic-list: <topic1>;<topic2>;<topicN>
+    message-converter:
+      enable: 0
+      msg-conv-config: dstest5_msgconv_sample_config.txt
+      msg-conv-payload-type: 0
+    osd:
+      border-width: 1
+      clock-color: 1;0;0;0
+      clock-text-size: 12
+      clock-x-offset: 800
+      clock-y-offset: 820
+      enable: 1
+      font: Arial
+      gpu-id: 0
+      nvbuf-memory-type: 0
+      show-clock: 0
+      text-bg-color: 0.3;0.3;0.3;1
+      text-color: 1;1;1;1;
+      text-size: 15
+    primary-gie:
+      batch-size: 10
+      bbox-border-color0: 1;0;0;1
+      bbox-border-color1: 0;1;1;1
+      bbox-border-color2: 0;1;1;1
+      bbox-border-color3: 0;1;0;1
+      config-file: /opt/configs/mtmc_pgie_config.txt
+      enable: 1
+      gie-unique-id: 1
+      gpu-id: 0
+      interval: 0
+      nvbuf-memory-type: 0
+    secondary-gie0:
+      batch-size: 40
+      config-file: /opt/configs/mtmc_sgie_config.txt
+      enable: 1
+      gie-unique-id: 2
+      gpu-id: 0
+      operate-on-class-ids: 0
+      operate-on-gie-id: 1
+    sink0:
+      enable: 0
+      gpu-id: 0
+      nvbuf-memory-type: 0
+      source-id: 0
+      sync: 0
+      type: 1
+    sink1:
+      enable: 1
+      msg-broker-conn-str: mdx-kafka-cluster-kafka-brokers;9092;mdx-raw
+      msg-broker-proto-lib: /opt/nvidia/deepstream/deepstream/lib/libnvds_kafka_proto.so
+      msg-conv-config: /opt/configs/mtmc_msgconv_config.txt
+      msg-conv-frame-interval: 1
+      msg-conv-msg2p-new-api: 0
+      msg-conv-payload-type: 2
+      topic: mdx-raw
+      type: 6
+    sink2:
+      bitrate: 2000000
+      codec: 3
+      container: 1
+      enable: 0
+      output-file: out.mp4
+      source-id: 0
+      sync: 1
+      type: 3
+    source-attr-all:
+      cudadec-memtype: 0
+      enable: 1
+      gpu-id: 0
+      latency: 100
+      num-sources: 1
+      rtsp-reconnect-interval-sec: 0
+      type: 3
+    sourceTemplate:
+      enable: 1
+      gpu-id: 0
+      latency: 300
+      num-sources: 1
+      nvbuf-memory-type: 0
+      rtsp-reconnect-interval-sec: 120
+      select-rtp-protocol: 4
+      type: 2
+      uri: rtsp://url
+    streammux:
+      attach-sys-ts-as-ntp: 0
+      batch-size: 10
+      batched-push-timeout: 40000
+      enable-padding: 0
+      gpu-id: 0
+      height: 1080
+      live-source: 0
+      nvbuf-memory-type: 0
+      width: 1920
+    tests:
+      file-loop: 0
+    tiled-display:
+      columns: 2
+      enable: 1
+      gpu-id: 0
+      height: 720
+      nvbuf-memory-type: 0
+      rows: 1
+      width: 1280
+    tracker:
+      display-tracking-id: 1
+      enable: 1
+      enable-batch-process: 1
+      enable-past-frame: 1
+      gpu-id: 0
+      ll-config-file: /opt/nvidia/deepstream/deepstream/samples/configs/deepstream-app/config_tracker_NvDCF_accuracy.yml
+      ll-lib-file: /opt/nvidia/deepstream/deepstream/lib/libnvds_nvmultiobjecttracker.so
+      tracker-height: 960
+      tracker-width: 544
+  mtmc_config.txt:
+    application:
+      enable-perf-measurement: 1
+      perf-measurement-interval-sec: 5
+    message-consumer0:
+      config-file: /opt/nvidia/deepstream/deepstream/sources/libs/kafka_protocol_adaptor/cfg_kafka.txt
+      conn-str: <host>;<port>
+      enable: 0
+      proto-lib: /opt/nvidia/deepstream/deepstream/lib/libnvds_kafka_proto.so
+      subscribe-topic-list: <topic1>;<topic2>;<topicN>
+    message-converter:
+      enable: 0
+      msg-conv-config: dstest5_msgconv_sample_config.txt
+      msg-conv-payload-type: 0
+    osd:
+      border-width: 1
+      clock-color: 1;0;0;0
+      clock-text-size: 12
+      clock-x-offset: 800
+      clock-y-offset: 820
+      enable: 1
+      font: Arial
+      gpu-id: 0
+      nvbuf-memory-type: 0
+      show-clock: 0
+      text-bg-color: 0.3;0.3;0.3;1
+      text-color: 1;1;1;1;
+      text-size: 15
+    primary-gie:
+      batch-size: 10
+      bbox-border-color0: 1;0;0;1
+      bbox-border-color1: 0;1;1;1
+      bbox-border-color2: 0;1;1;1
+      bbox-border-color3: 0;1;0;1
+      config-file: /opt/configs/mtmc_pgie_config.txt
+      enable: 1
+      gie-unique-id: 1
+      gpu-id: 0
+      interval: 0
+      nvbuf-memory-type: 0
+    secondary-gie0:
+      batch-size: 40
+      config-file: /opt/configs/mtmc_sgie_config.txt
+      enable: 1
+      gie-unique-id: 2
+      gpu-id: 0
+      operate-on-class-ids: 0
+      operate-on-gie-id: 1
+    sink0:
+      enable: 1
+      gpu-id: 0
+      nvbuf-memory-type: 0
+      source-id: 0
+      sync: 0
+      type: 1
+    sink1:
+      enable: 1
+      msg-broker-conn-str: mdx-kafka-cluster-kafka-brokers;9092;mdx-raw
+      msg-broker-proto-lib: /opt/nvidia/deepstream/deepstream/lib/libnvds_kafka_proto.so
+      msg-conv-config: /opt/configs/mtmc_msgconv_config.txt
+      msg-conv-frame-interval: 1
+      msg-conv-msg2p-new-api: 0
+      msg-conv-payload-type: 2
+      topic: mdx-raw
+      type: 6
+    sink2:
+      bitrate: 2000000
+      codec: 3
+      container: 1
+      enable: 0
+      output-file: out.mp4
+      source-id: 0
+      sync: 1
+      type: 3
+    source-attr-all:
+      cudadec-memtype: 0
+      enable: 1
+      gpu-id: 0
+      latency: 100
+      num-sources: 1
+      rtsp-reconnect-interval-sec: 0
+      type: 3
+    source-list:
+      http-ip: localhost
+      http-port: 9000
+      list: file:///opt/nvidia/deepstream/deepstream/samples/streams/sample_1080p_h264.mp4
+      max-batch-size: 10
+      num-source-bins: 1
+      sgie-batch-size: 40
+      use-nvmultiurisrcbin: 1
+    streammux:
+      attach-sys-ts-as-ntp: 0
+      batch-size: 10
+      batched-push-timeout: 40000
+      drop-pipeline-eos: 1
+      enable-padding: 0
+      gpu-id: 0
+      height: 1080
+      live-source: 1
+      nvbuf-memory-type: 0
+      width: 1920
+    tests:
+      file-loop: 0
+    tiled-display:
+      columns: 2
+      enable: 1
+      gpu-id: 0
+      height: 720
+      nvbuf-memory-type: 0
+      rows: 1
+      width: 1280
+    tracker:
+      display-tracking-id: 1
+      enable: 1
+      enable-batch-process: 1
+      enable-past-frame: 1
+      gpu-id: 0
+      ll-config-file: /opt/nvidia/deepstream/deepstream/samples/configs/deepstream-app/config_tracker_NvDCF_accuracy.yml
+      ll-lib-file: /opt/nvidia/deepstream/deepstream/lib/libnvds_nvmultiobjecttracker.so
+      tracker-height: 960
+      tracker-width: 544
+  mtmc_config_ddetr.properties:
+    application:
+      enable-perf-measurement: 1
+      perf-measurement-interval-sec: 5
+    message-consumer0:
+      config-file: /opt/nvidia/deepstream/deepstream/sources/libs/kafka_protocol_adaptor/cfg_kafka.txt
+      conn-str: <host>;<port>
+      enable: 0
+      proto-lib: /opt/nvidia/deepstream/deepstream/lib/libnvds_kafka_proto.so
+      subscribe-topic-list: <topic1>;<topic2>;<topicN>
+    message-converter:
+      enable: 0
+      msg-conv-config: dstest5_msgconv_sample_config.txt
+      msg-conv-payload-type: 0
+    osd:
+      border-width: 1
+      clock-color: 1;0;0;0
+      clock-text-size: 12
+      clock-x-offset: 800
+      clock-y-offset: 820
+      enable: 1
+      font: Arial
+      gpu-id: 0
+      nvbuf-memory-type: 0
+      show-clock: 0
+      text-bg-color: 0.3;0.3;0.3;1
+      text-color: 1;1;1;1;
+      text-size: 15
+    primary-gie:
+      batch-size: 10
+      bbox-border-color0: 1;0;0;1
+      bbox-border-color1: 0;1;1;1
+      bbox-border-color2: 0;1;1;1
+      bbox-border-color3: 0;1;0;1
+      config-file: /opt/configs/mtmc_pgie_config_ddetr.txt
+      enable: 1
+      gie-unique-id: 1
+      gpu-id: 0
+      interval: 0
+      nvbuf-memory-type: 0
+    secondary-gie0:
+      batch-size: 40
+      config-file: /opt/configs/mtmc_sgie_config_ddetr.txt
+      enable: 1
+      gie-unique-id: 2
+      gpu-id: 0
+      operate-on-class-ids: 1
+      operate-on-gie-id: 1
+    sink0:
+      enable: 0
+      gpu-id: 0
+      nvbuf-memory-type: 0
+      source-id: 0
+      sync: 0
+      type: 1
+    sink1:
+      enable: 1
+      msg-broker-conn-str: mdx-kafka-cluster-kafka-brokers;9092;mdx-raw
+      msg-broker-proto-lib: /opt/nvidia/deepstream/deepstream/lib/libnvds_kafka_proto.so
+      msg-conv-config: /opt/configs/mtmc_msgconv_config.txt
+      msg-conv-frame-interval: 1
+      msg-conv-msg2p-new-api: 0
+      msg-conv-payload-type: 2
+      topic: mdx-raw
+      type: 6
+    sink2:
+      bitrate: 2000000
+      codec: 3
+      container: 1
+      enable: 0
+      output-file: out.mp4
+      source-id: 0
+      sync: 1
+      type: 3
+    sourceTemplate:
+      enable: 1
+      gpu-id: 0
+      latency: 300
+      num-sources: 1
+      nvbuf-memory-type: 0
+      rtsp-reconnect-interval-sec: 120
+      select-rtp-protocol: 4
+      type: 2
+      uri: rtsp://url
+    streammux:
+      attach-sys-ts-as-ntp: 0
+      batch-size: 10
+      batched-push-timeout: 40000
+      enable-padding: 0
+      gpu-id: 0
+      height: 1080
+      live-source: 0
+      nvbuf-memory-type: 0
+      width: 1920
+    tests:
+      file-loop: 0
+    tiled-display:
+      columns: 2
+      enable: 1
+      gpu-id: 0
+      height: 720
+      nvbuf-memory-type: 0
+      rows: 1
+      width: 1280
+    tracker:
+      display-tracking-id: 1
+      enable: 1
+      enable-batch-process: 1
+      enable-past-frame: 1
+      gpu-id: 0
+      ll-config-file: /opt/nvidia/deepstream/deepstream/samples/configs/deepstream-app/config_tracker_NvDCF_accuracy.yml
+      ll-lib-file: /opt/nvidia/deepstream/deepstream/lib/libnvds_nvmultiobjecttracker.so
+      tracker-height: 960
+      tracker-width: 544
+  mtmc_config_ddetr.txt:
+    application:
+      enable-perf-measurement: 1
+      perf-measurement-interval-sec: 5
+    message-consumer0:
+      config-file: /opt/nvidia/deepstream/deepstream/sources/libs/kafka_protocol_adaptor/cfg_kafka.txt
+      conn-str: <host>;<port>
+      enable: 0
+      proto-lib: /opt/nvidia/deepstream/deepstream/lib/libnvds_kafka_proto.so
+      subscribe-topic-list: <topic1>;<topic2>;<topicN>
+    message-converter:
+      enable: 0
+      msg-conv-config: dstest5_msgconv_sample_config.txt
+      msg-conv-payload-type: 0
+    osd:
+      border-width: 1
+      clock-color: 1;0;0;0
+      clock-text-size: 12
+      clock-x-offset: 800
+      clock-y-offset: 820
+      enable: 1
+      font: Arial
+      gpu-id: 0
+      nvbuf-memory-type: 0
+      show-clock: 0
+      text-bg-color: 0.3;0.3;0.3;1
+      text-color: 1;1;1;1;
+      text-size: 15
+    primary-gie:
+      batch-size: 10
+      bbox-border-color0: 1;0;0;1
+      bbox-border-color1: 0;1;1;1
+      bbox-border-color2: 0;1;1;1
+      bbox-border-color3: 0;1;0;1
+      config-file: /opt/configs/mtmc_pgie_config_ddetr.txt
+      enable: 1
+      gie-unique-id: 1
+      gpu-id: 0
+      interval: 0
+      nvbuf-memory-type: 0
+    secondary-gie0:
+      batch-size: 40
+      config-file: /opt/configs/mtmc_sgie_config_ddetr.txt
+      enable: 1
+      gie-unique-id: 2
+      gpu-id: 0
+      operate-on-class-ids: 1
+      operate-on-gie-id: 1
+    sink0:
+      enable: 1
+      gpu-id: 0
+      nvbuf-memory-type: 0
+      source-id: 0
+      sync: 0
+      type: 1
+    sink1:
+      enable: 1
+      msg-broker-conn-str: mdx-kafka-cluster-kafka-brokers;9092;mdx-raw
+      msg-broker-proto-lib: /opt/nvidia/deepstream/deepstream/lib/libnvds_kafka_proto.so
+      msg-conv-config: /opt/configs/mtmc_msgconv_config.txt
+      msg-conv-frame-interval: 1
+      msg-conv-msg2p-new-api: 0
+      msg-conv-payload-type: 2
+      topic: mdx-raw
+      type: 6
+    sink2:
+      bitrate: 2000000
+      codec: 3
+      container: 1
+      enable: 0
+      output-file: out.mp4
+      source-id: 0
+      sync: 1
+      type: 3
+    source-attr-all:
+      cudadec-memtype: 0
+      enable: 1
+      gpu-id: 0
+      latency: 100
+      num-sources: 1
+      rtsp-reconnect-interval-sec: 0
+      type: 3
+    source-list:
+      http-ip: localhost
+      http-port: 9000
+      list: file:///opt/nvidia/deepstream/deepstream/samples/streams/sample_1080p_h264.mp4
+      max-batch-size: 10
+      num-source-bins: 1
+      sgie-batch-size: 40
+      use-nvmultiurisrcbin: 1
+    streammux:
+      attach-sys-ts-as-ntp: 0
+      batch-size: 10
+      batched-push-timeout: 40000
+      drop-pipeline-eos: 1
+      enable-padding: 0
+      gpu-id: 0
+      height: 1080
+      live-source: 1
+      nvbuf-memory-type: 0
+      width: 1920
+    tests:
+      file-loop: 0
+    tiled-display:
+      columns: 2
+      enable: 1
+      gpu-id: 0
+      height: 720
+      nvbuf-memory-type: 0
+      rows: 1
+      width: 1280
+    tracker:
+      display-tracking-id: 1
+      enable: 1
+      enable-batch-process: 1
+      enable-past-frame: 1
+      gpu-id: 0
+      ll-config-file: /opt/nvidia/deepstream/deepstream/samples/configs/deepstream-app/config_tracker_NvDCF_accuracy.yml
+      ll-lib-file: /opt/nvidia/deepstream/deepstream/lib/libnvds_nvmultiobjecttracker.so
+      tracker-height: 960
+      tracker-width: 544
+  mtmc_config_ddetr_init.txt:
+    application:
+      enable-perf-measurement: 1
+      perf-measurement-interval-sec: 5
+    message-consumer0:
+      config-file: /opt/nvidia/deepstream/deepstream/sources/libs/kafka_protocol_adaptor/cfg_kafka.txt
+      conn-str: <host>;<port>
+      enable: 0
+      proto-lib: /opt/nvidia/deepstream/deepstream/lib/libnvds_kafka_proto.so
+      subscribe-topic-list: <topic1>;<topic2>;<topicN>
+    message-converter:
+      enable: 0
+      msg-conv-config: dstest5_msgconv_sample_config.txt
+      msg-conv-payload-type: 0
+    osd:
+      border-width: 1
+      clock-color: 1;0;0;0
+      clock-text-size: 12
+      clock-x-offset: 800
+      clock-y-offset: 820
+      enable: 1
+      font: Arial
+      gpu-id: 0
+      nvbuf-memory-type: 0
+      show-clock: 0
+      text-bg-color: 0.3;0.3;0.3;1
+      text-color: 1;1;1;1;
+      text-size: 15
+    primary-gie:
+      batch-size: 10
+      bbox-border-color0: 1;0;0;1
+      bbox-border-color1: 0;1;1;1
+      bbox-border-color2: 0;1;1;1
+      bbox-border-color3: 0;1;0;1
+      config-file: /opt/configs/mtmc_pgie_config_ddetr.txt
+      enable: 1
+      gie-unique-id: 1
+      gpu-id: 0
+      interval: 0
+      nvbuf-memory-type: 0
+    secondary-gie0:
+      batch-size: 40
+      config-file: /opt/configs/mtmc_sgie_config_ddetr.txt
+      enable: 1
+      gie-unique-id: 2
+      gpu-id: 0
+      operate-on-class-ids: 1
+      operate-on-gie-id: 1
+    sink0:
+      enable: 1
+      gpu-id: 0
+      nvbuf-memory-type: 0
+      source-id: 0
+      sync: 0
+      type: 1
+    sink1:
+      enable: 0
+      msg-broker-conn-str: mdx-kafka-cluster-kafka-brokers;9092;mdx-raw
+      msg-broker-proto-lib: /opt/nvidia/deepstream/deepstream/lib/libnvds_kafka_proto.so
+      msg-conv-config: /opt/configs/mtmc_msgconv_config.txt
+      msg-conv-frame-interval: 1
+      msg-conv-msg2p-new-api: 0
+      msg-conv-payload-type: 2
+      topic: mdx-raw
+      type: 6
+    sink2:
+      bitrate: 2000000
+      codec: 3
+      container: 1
+      enable: 0
+      output-file: out.mp4
+      source-id: 0
+      sync: 1
+      type: 3
+    source-attr-all:
+      cudadec-memtype: 0
+      enable: 1
+      gpu-id: 0
+      latency: 100
+      num-sources: 1
+      rtsp-reconnect-interval-sec: 0
+      type: 3
+    source-list:
+      http-ip: localhost
+      http-port: 9000
+      list: file:///opt/nvidia/deepstream/deepstream/samples/streams/sample_1080p_h264.jpg
+      max-batch-size: 10
+      num-source-bins: 1
+      sgie-batch-size: 40
+      use-nvmultiurisrcbin: 1
+    streammux:
+      attach-sys-ts-as-ntp: 0
+      batch-size: 10
+      batched-push-timeout: 40000
+      drop-pipeline-eos: 0
+      enable-padding: 0
+      gpu-id: 0
+      height: 1080
+      live-source: 1
+      nvbuf-memory-type: 0
+      width: 1920
+    tests:
+      file-loop: 0
+    tiled-display:
+      columns: 2
+      enable: 1
+      gpu-id: 0
+      height: 720
+      nvbuf-memory-type: 0
+      rows: 1
+      width: 1280
+    tracker:
+      display-tracking-id: 1
+      enable: 1
+      enable-batch-process: 1
+      enable-past-frame: 1
+      gpu-id: 0
+      ll-config-file: /opt/nvidia/deepstream/deepstream/samples/configs/deepstream-app/config_tracker_NvDCF_accuracy.yml
+      ll-lib-file: /opt/nvidia/deepstream/deepstream/lib/libnvds_nvmultiobjecttracker.so
+      tracker-height: 960
+      tracker-width: 544
+  mtmc_config_init.txt:
+    application:
+      enable-perf-measurement: 1
+      perf-measurement-interval-sec: 5
+    message-consumer0:
+      config-file: /opt/nvidia/deepstream/deepstream/sources/libs/kafka_protocol_adaptor/cfg_kafka.txt
+      conn-str: <host>;<port>
+      enable: 0
+      proto-lib: /opt/nvidia/deepstream/deepstream/lib/libnvds_kafka_proto.so
+      subscribe-topic-list: <topic1>;<topic2>;<topicN>
+    message-converter:
+      enable: 0
+      msg-conv-config: dstest5_msgconv_sample_config.txt
+      msg-conv-payload-type: 0
+    osd:
+      border-width: 1
+      clock-color: 1;0;0;0
+      clock-text-size: 12
+      clock-x-offset: 800
+      clock-y-offset: 820
+      enable: 1
+      font: Arial
+      gpu-id: 0
+      nvbuf-memory-type: 0
+      show-clock: 0
+      text-bg-color: 0.3;0.3;0.3;1
+      text-color: 1;1;1;1;
+      text-size: 15
+    primary-gie:
+      batch-size: 10
+      bbox-border-color0: 1;0;0;1
+      bbox-border-color1: 0;1;1;1
+      bbox-border-color2: 0;1;1;1
+      bbox-border-color3: 0;1;0;1
+      config-file: /opt/configs/mtmc_pgie_config.txt
+      enable: 1
+      gie-unique-id: 1
+      gpu-id: 0
+      interval: 0
+      nvbuf-memory-type: 0
+    secondary-gie0:
+      batch-size: 40
+      config-file: /opt/configs/mtmc_sgie_config.txt
+      enable: 1
+      gie-unique-id: 2
+      gpu-id: 0
+      operate-on-class-ids: 0
+      operate-on-gie-id: 1
+    sink0:
+      enable: 1
+      gpu-id: 0
+      nvbuf-memory-type: 0
+      source-id: 0
+      sync: 0
+      type: 1
+    sink1:
+      enable: 0
+      msg-broker-conn-str: mdx-kafka-cluster-kafka-brokers;9092;mdx-raw
+      msg-broker-proto-lib: /opt/nvidia/deepstream/deepstream/lib/libnvds_kafka_proto.so
+      msg-conv-config: /opt/configs/mtmc_msgconv_config.txt
+      msg-conv-frame-interval: 1
+      msg-conv-msg2p-new-api: 0
+      msg-conv-payload-type: 2
+      topic: mdx-raw
+      type: 6
+    sink2:
+      bitrate: 2000000
+      codec: 3
+      container: 1
+      enable: 0
+      output-file: out.mp4
+      source-id: 0
+      sync: 1
+      type: 3
+    source-attr-all:
+      cudadec-memtype: 0
+      enable: 1
+      gpu-id: 0
+      latency: 100
+      num-sources: 1
+      rtsp-reconnect-interval-sec: 0
+      type: 3
+    source-list:
+      http-ip: localhost
+      http-port: 9000
+      list: file:///opt/nvidia/deepstream/deepstream/samples/streams/sample_1080p_h264.jpg
+      max-batch-size: 10
+      num-source-bins: 1
+      sgie-batch-size: 40
+      use-nvmultiurisrcbin: 1
+    streammux:
+      attach-sys-ts-as-ntp: 0
+      batch-size: 4
+      batched-push-timeout: 40000
+      drop-pipeline-eos: 0
+      enable-padding: 0
+      gpu-id: 0
+      height: 1080
+      live-source: 1
+      nvbuf-memory-type: 0
+      width: 1920
+    tests:
+      file-loop: 0
+    tiled-display:
+      columns: 2
+      enable: 1
+      gpu-id: 0
+      height: 720
+      nvbuf-memory-type: 0
+      rows: 1
+      width: 1280
+    tracker:
+      display-tracking-id: 1
+      enable: 1
+      enable-batch-process: 1
+      enable-past-frame: 1
+      gpu-id: 0
+      ll-config-file: /opt/nvidia/deepstream/deepstream/samples/configs/deepstream-app/config_tracker_NvDCF_accuracy.yml
+      ll-lib-file: /opt/nvidia/deepstream/deepstream/lib/libnvds_nvmultiobjecttracker.so
+      tracker-height: 960
+      tracker-width: 544
+  mtmc_init_workload:
+    deepstream-0:
+      analytics-0:
+        description: Building_K_Cam_7
+        enable: 1
+        id: XYZ_1
+        source: OpenALR
+        version: 1.0
+      place-0:
+        coordinate: 1.0;2.0;3.0
+        enable: 1
+        id: 0
+        location: 30.32;-40.55;100.0
+        name: Building_K_Cam_7
+        place-sub-field1: C_127_158
+        place-sub-field2: Lane 1
+        place-sub-field3: P1
+        type: intersection/road
+      sensor-0:
+        coordinate: 5.2;10.1;11.2
+        description: Aisle Camera
+        enable: 1
+        id: Building_K_Cam_7
+        location: 45.293701447;-75.8303914499;48.1557479338
+        type: Camera
+      source-0:
+        cuda-memory-type: 1
+        enable: 1
+        gpu-id: 0
+        latency: 300
+        num-sources: 1
+        nvbuf-memory-type: 0
+        rtsp-reconnect-attempts: 0
+        rtsp-reconnect-interval-sec: 0
+        select-rtp-protocol: 4
+        type: 2
+        url: file:///opt/nvidia/deepstream/deepstream/sources/apps/sample_apps/deepstream-fewshot-learning-app/samples/Building_K_Cam7.mp4
+  mtmc_msgconv_config.txt:
+    analytics0:
+      description: MDX_Demo_Stream
+      enable: 1
+      id: MDX_Perception
+      source: OpenALR
+      version: 1.0
+    place0:
+      coordinate: 1.0;2.0;3.0
+      enable: 1
+      id: 0
+      location: 30.32;-40.55;100.0
+      name: MTMC_Demo_Stream
+      place-sub-field1: Demo
+      place-sub-field2: MDX
+      place-sub-field3: stream1
+      type: intersection/road
+    sensor0:
+      coordinate: 5.2;10.1;11.2
+      description: MTMC_Demo_Stream
+      enable: 1
+      id: stream1
+      location: 45.293701447;-75.8303914499;48.1557479338
+      type: Camera
+  mtmc_pgie_config.txt:
+    class-attrs-all:
+      dbscan-min-score: 1.3
+      detected-min-h: 20
+      detected-min-w: 20
+      eps: 0.15
+      minboxes: 3
+      nms-iou-threshold: 0.5
+      pre-cluster-threshold: 0.3
+    property:
+      cluster-mode: 3
+      gie-unique-id: 1
+      gpu-id: 0
+      infer-dims: 3;544;960
+      int8-calib-file: /opt/nvidia/deepstream/deepstream/sources/apps/sample_apps/deepstream-fewshot-learning-app/models/mtmc/resnet34_peoplenet_int8.txt
+      interval: 0
+      labelfile-path: /opt/nvidia/deepstream/deepstream/sources/apps/sample_apps/deepstream-fewshot-learning-app/configs/mtmc/detector_labels.txt
+      maintain-aspect-ratio: 1
+      model-color-format: 0
+      model-engine-file: /opt/storage/detector.etlt_b10_gpu0_fp16.engine
+      net-scale-factor: 0.003921569790691137
+      network-mode: 2
+      num-detected-classes: 3
+      output-blob-names: output_bbox/BiasAdd;output_cov/Sigmoid
+      process-mode: 1
+      tlt-encoded-model: /opt/storage/detector.etlt
+      tlt-model-key: tlt_encode
+      uff-input-blob-name: input_1
+  mtmc_pgie_config_ddetr.txt:
+    class-attrs-all:
+      nms-iou-threshold: 0.5
+      pre-cluster-threshold: 0.2
+    property:
+      cluster-mode: 3
+      custom-lib-path: /opt/nvidia/deepstream/deepstream/sources/apps/sample_apps/deepstream-fewshot-learning-app/custom_parser/libnvds_infercustomparser_tao.so
+      gie-unique-id: 1
+      gpu-id: 0
+      infer-dims: 3;544;960
+      interval: 0
+      labelfile-path: /opt/nvidia/deepstream/deepstream/sources/apps/sample_apps/deepstream-fewshot-learning-app/configs/mtmc/detector_labels_ddetr.txt
+      maintain-aspect-ratio: 1
+      model-engine-file: /opt/storage/detector.etlt_b10_gpu0_fp16.engine
+      net-scale-factor: 0.0173520735728
+      network-mode: 2
+      num-detected-classes: 4
+      offsets: 123.675;116.28;103.53
+      output-blob-names: pred_boxes;pred_logits
+      parse-bbox-func-name: NvDsInferParseCustomDDETRTAO
+      tlt-encoded-model: /opt/storage/detector.etlt
+      tlt-model-key: nvidia_tao
+      uff-input-blob-name: input_1
+  mtmc_sgie_config.txt:
+    property:
+      batch-size: 40
+      classifier-threshold: 0.0
+      gie-unique-id: 2
+      gpu-id: 0
+      infer-dims: 3;256;128
+      interval: 0
+      maintain-aspect-ratio: 0
+      model-color-format: 0
+      model-engine-file: /opt/storage/embedder.onnx_b40_gpu0_fp16.engine
+      net-scale-factor: 0.01735207357279195
+      network-mode: 2
+      network-type: 100
+      offsets: 123.675;116.28;103.53
+      onnx-file: /opt/storage/embedder.onnx
+      operate-on-class-ids: 0
+      operate-on-gie-id: 1
+      output-tensor-meta: 1
+      process-mode: 2
+  mtmc_sgie_config_ddetr.txt:
+    property:
+      batch-size: 40
+      classifier-threshold: 0.0
+      gie-unique-id: 2
+      gpu-id: 0
+      infer-dims: 3;256;128
+      interval: 0
+      maintain-aspect-ratio: 0
+      model-color-format: 0
+      model-engine-file: /opt/storage/embedder.onnx_b40_gpu0_fp16.engine
+      net-scale-factor: 0.01735207357279195
+      network-mode: 2
+      network-type: 100
+      offsets: 123.675;116.28;103.53
+      onnx-file: /opt/storage/embedder.onnx
+      operate-on-class-ids: 1
+      operate-on-gie-id: 1
+      output-tensor-meta: 1
+      process-mode: 2
+  ppl_analytics_config.properties:
+    application:
+      enable-perf-measurement: 1
+      perf-measurement-interval-sec: 5
+    message-consumer0:
+      config-file: /opt/nvidia/deepstream/deepstream/sources/libs/kafka_protocol_adaptor/cfg_kafka.txt
+      conn-str: <host>;<port>
+      enable: 0
+      proto-lib: /opt/nvidia/deepstream/deepstream/lib/libnvds_kafka_proto.so
+      subscribe-topic-list: <topic1>;<topic2>;<topicN>
+    message-converter:
+      enable: 0
+      msg-conv-config: dstest5_msgconv_sample_config.txt
+      msg-conv-payload-type: 0
+    osd:
+      border-width: 1
+      clock-color: 1;0;0;0
+      clock-text-size: 12
+      clock-x-offset: 800
+      clock-y-offset: 820
+      enable: 1
+      font: Arial
+      gpu-id: 0
+      nvbuf-memory-type: 0
+      show-clock: 0
+      text-bg-color: 0.3;0.3;0.3;1
+      text-color: 1;1;1;1;
+      text-size: 15
+    primary-gie:
+      batch-size: 10
+      bbox-border-color0: 1;0;0;1
+      bbox-border-color1: 0;1;1;1
+      bbox-border-color2: 0;1;1;1
+      bbox-border-color3: 0;1;0;1
+      config-file: /opt/configs/mtmc_pgie_config.txt
+      enable: 1
+      gie-unique-id: 1
+      gpu-id: 0
+      interval: 0
+      nvbuf-memory-type: 0
+    secondary-gie0:
+      batch-size: 40
+      config-file: /opt/configs/mtmc_sgie_config.txt
+      enable: 0
+      gie-unique-id: 2
+      gpu-id: 0
+      operate-on-class-ids: 0
+      operate-on-gie-id: 1
+    sink0:
+      enable: 0
+      gpu-id: 0
+      nvbuf-memory-type: 0
+      source-id: 0
+      sync: 0
+      type: 1
+    sink1:
+      enable: 1
+      msg-broker-conn-str: mdx-kafka-cluster-kafka-brokers;9092;mdx-raw
+      msg-broker-proto-lib: /opt/nvidia/deepstream/deepstream/lib/libnvds_kafka_proto.so
+      msg-conv-config: /opt/configs/mtmc_msgconv_config.txt
+      msg-conv-frame-interval: 1
+      msg-conv-msg2p-new-api: 0
+      msg-conv-payload-type: 2
+      topic: mdx-raw
+      type: 6
+    sink2:
+      bitrate: 2000000
+      codec: 3
+      container: 1
+      enable: 0
+      output-file: out.mp4
+      source-id: 0
+      sync: 1
+      type: 3
+    sourceTemplate:
+      enable: 1
+      gpu-id: 0
+      latency: 300
+      num-sources: 1
+      nvbuf-memory-type: 0
+      rtsp-reconnect-interval-sec: 120
+      select-rtp-protocol: 4
+      type: 2
+      uri: rtsp://url
+    streammux:
+      attach-sys-ts-as-ntp: 0
+      batch-size: 10
+      batched-push-timeout: 40000
+      enable-padding: 0
+      gpu-id: 0
+      height: 1080
+      live-source: 0
+      nvbuf-memory-type: 0
+      width: 1920
+    tests:
+      file-loop: 0
+    tiled-display:
+      columns: 2
+      enable: 1
+      gpu-id: 0
+      height: 720
+      nvbuf-memory-type: 0
+      rows: 1
+      width: 1280
+    tracker:
+      display-tracking-id: 1
+      enable: 1
+      enable-batch-process: 1
+      enable-past-frame: 1
+      gpu-id: 0
+      ll-config-file: /opt/nvidia/deepstream/deepstream/samples/configs/deepstream-app/config_tracker_NvDCF_accuracy.yml
+      ll-lib-file: /opt/nvidia/deepstream/deepstream/lib/libnvds_nvmultiobjecttracker.so
+      tracker-height: 960
+      tracker-width: 544
+  ppl_analytics_config.txt:
+    application:
+      enable-perf-measurement: 1
+      perf-measurement-interval-sec: 5
+    message-consumer0:
+      config-file: /opt/nvidia/deepstream/deepstream/sources/libs/kafka_protocol_adaptor/cfg_kafka.txt
+      conn-str: <host>;<port>
+      enable: 0
+      proto-lib: /opt/nvidia/deepstream/deepstream/lib/libnvds_kafka_proto.so
+      subscribe-topic-list: <topic1>;<topic2>;<topicN>
+    message-converter:
+      enable: 0
+      msg-conv-config: dstest5_msgconv_sample_config.txt
+      msg-conv-payload-type: 0
+    osd:
+      border-width: 1
+      clock-color: 1;0;0;0
+      clock-text-size: 12
+      clock-x-offset: 800
+      clock-y-offset: 820
+      enable: 1
+      font: Arial
+      gpu-id: 0
+      nvbuf-memory-type: 0
+      show-clock: 0
+      text-bg-color: 0.3;0.3;0.3;1
+      text-color: 1;1;1;1;
+      text-size: 15
+    primary-gie:
+      batch-size: 10
+      bbox-border-color0: 1;0;0;1
+      bbox-border-color1: 0;1;1;1
+      bbox-border-color2: 0;1;1;1
+      bbox-border-color3: 0;1;0;1
+      config-file: /opt/configs/mtmc_pgie_config.txt
+      enable: 1
+      gie-unique-id: 1
+      gpu-id: 0
+      interval: 0
+      nvbuf-memory-type: 0
+    secondary-gie0:
+      batch-size: 40
+      config-file: /opt/configs/mtmc_sgie_config.txt
+      enable: 0
+      gie-unique-id: 2
+      gpu-id: 0
+      operate-on-class-ids: 0
+      operate-on-gie-id: 1
+    sink0:
+      enable: 1
+      gpu-id: 0
+      nvbuf-memory-type: 0
+      source-id: 0
+      sync: 0
+      type: 1
+    sink1:
+      enable: 1
+      msg-broker-conn-str: mdx-kafka-cluster-kafka-brokers;9092;mdx-raw
+      msg-broker-proto-lib: /opt/nvidia/deepstream/deepstream/lib/libnvds_kafka_proto.so
+      msg-conv-config: /opt/configs/mtmc_msgconv_config.txt
+      msg-conv-frame-interval: 1
+      msg-conv-msg2p-new-api: 0
+      msg-conv-payload-type: 2
+      topic: mdx-raw
+      type: 6
+    sink2:
+      bitrate: 2000000
+      codec: 3
+      container: 1
+      enable: 0
+      output-file: out.mp4
+      source-id: 0
+      sync: 1
+      type: 3
+    source-attr-all:
+      cudadec-memtype: 0
+      enable: 1
+      gpu-id: 0
+      latency: 100
+      num-sources: 1
+      rtsp-reconnect-interval-sec: 0
+      type: 3
+    source-list:
+      http-ip: localhost
+      http-port: 9000
+      list: file:///opt/nvidia/deepstream/deepstream/samples/streams/sample_1080p_h264.mp4
+      max-batch-size: 10
+      num-source-bins: 1
+      sgie-batch-size: 40
+      use-nvmultiurisrcbin: 1
+    streammux:
+      attach-sys-ts-as-ntp: 0
+      batch-size: 10
+      batched-push-timeout: 40000
+      drop-pipeline-eos: 1
+      enable-padding: 0
+      gpu-id: 0
+      height: 1080
+      live-source: 1
+      nvbuf-memory-type: 0
+      width: 1920
+    tests:
+      file-loop: 0
+    tiled-display:
+      columns: 2
+      enable: 1
+      gpu-id: 0
+      height: 720
+      nvbuf-memory-type: 0
+      rows: 1
+      width: 1280
+    tracker:
+      display-tracking-id: 1
+      enable: 1
+      enable-batch-process: 1
+      enable-past-frame: 1
+      gpu-id: 0
+      ll-config-file: /opt/nvidia/deepstream/deepstream/samples/configs/deepstream-app/config_tracker_NvDCF_accuracy.yml
+      ll-lib-file: /opt/nvidia/deepstream/deepstream/lib/libnvds_nvmultiobjecttracker.so
+      tracker-height: 960
+      tracker-width: 544
+  ppl_analytics_config_init.txt:
+    application:
+      enable-perf-measurement: 1
+      perf-measurement-interval-sec: 5
+    message-consumer0:
+      config-file: /opt/nvidia/deepstream/deepstream/sources/libs/kafka_protocol_adaptor/cfg_kafka.txt
+      conn-str: <host>;<port>
+      enable: 0
+      proto-lib: /opt/nvidia/deepstream/deepstream/lib/libnvds_kafka_proto.so
+      subscribe-topic-list: <topic1>;<topic2>;<topicN>
+    message-converter:
+      enable: 0
+      msg-conv-config: dstest5_msgconv_sample_config.txt
+      msg-conv-payload-type: 0
+    osd:
+      border-width: 1
+      clock-color: 1;0;0;0
+      clock-text-size: 12
+      clock-x-offset: 800
+      clock-y-offset: 820
+      enable: 1
+      font: Arial
+      gpu-id: 0
+      nvbuf-memory-type: 0
+      show-clock: 0
+      text-bg-color: 0.3;0.3;0.3;1
+      text-color: 1;1;1;1;
+      text-size: 15
+    primary-gie:
+      batch-size: 10
+      bbox-border-color0: 1;0;0;1
+      bbox-border-color1: 0;1;1;1
+      bbox-border-color2: 0;1;1;1
+      bbox-border-color3: 0;1;0;1
+      config-file: /opt/configs/mtmc_pgie_config.txt
+      enable: 1
+      gie-unique-id: 1
+      gpu-id: 0
+      interval: 0
+      nvbuf-memory-type: 0
+    secondary-gie0:
+      batch-size: 40
+      config-file: /opt/configs/mtmc_sgie_config.txt
+      enable: 0
+      gie-unique-id: 2
+      gpu-id: 0
+      operate-on-class-ids: 0
+      operate-on-gie-id: 1
+    sink0:
+      enable: 1
+      gpu-id: 0
+      nvbuf-memory-type: 0
+      source-id: 0
+      sync: 0
+      type: 1
+    sink1:
+      enable: 0
+      msg-broker-config: /opt/nvidia/deepstream/deepstream/sources/libs/kafka_protocol_adaptor/cfg_kafka.txt
+      msg-broker-conn-str: mdx-kafka-cluster-kafka-brokers;9092;mdx-raw
+      msg-broker-proto-lib: /opt/nvidia/deepstream/deepstream/lib/libnvds_kafka_proto.so
+      msg-conv-config: /opt/configs/mtmc_msgconv_config.txt
+      msg-conv-frame-interval: 1
+      msg-conv-msg2p-new-api: 0
+      msg-conv-payload-type: 2
+      topic: mdx-raw
+      type: 6
+    sink2:
+      bitrate: 2000000
+      codec: 3
+      container: 1
+      enable: 0
+      output-file: out.mp4
+      source-id: 0
+      sync: 1
+      type: 3
+    source-attr-all:
+      cudadec-memtype: 0
+      enable: 1
+      gpu-id: 0
+      latency: 100
+      num-sources: 1
+      rtsp-reconnect-interval-sec: 0
+      type: 3
+    source-list:
+      http-ip: localhost
+      http-port: 9000
+      list: file:///opt/nvidia/deepstream/deepstream/samples/streams/sample_1080p_h264.jpg
+      max-batch-size: 10
+      num-source-bins: 1
+      sgie-batch-size: 40
+      use-nvmultiurisrcbin: 1
+    streammux:
+      attach-sys-ts-as-ntp: 0
+      batch-size: 10
+      batched-push-timeout: 40000
+      drop-pipeline-eos: 0
+      enable-padding: 0
+      gpu-id: 0
+      height: 1080
+      live-source: 1
+      nvbuf-memory-type: 0
+      width: 1920
+    tests:
+      file-loop: 0
+    tiled-display:
+      columns: 2
+      enable: 1
+      gpu-id: 0
+      height: 720
+      nvbuf-memory-type: 0
+      rows: 1
+      width: 1280
+    tracker:
+      display-tracking-id: 1
+      enable: 1
+      enable-batch-process: 1
+      enable-past-frame: 1
+      gpu-id: 0
+      ll-config-file: /opt/nvidia/deepstream/deepstream/samples/configs/deepstream-app/config_tracker_NvDCF_accuracy.yml
+      ll-lib-file: /opt/nvidia/deepstream/deepstream/lib/libnvds_nvmultiobjecttracker.so
+      tracker-height: 960
+      tracker-width: 544
+  template.properties:
+    analytics-$sensorNum:
+      description: $sensorId
+      enable: 1
+      id: MDX Perception
+      source: OpenALR
+      version: 1.0
+    place-$sensorNum:
+      coordinate: 0;0;0
+      enable: 1
+      id: $sensorNum
+      location: 0;0;0
+      name: $sensorId
+      place-sub-field1: Demo
+      place-sub-field2: MDX
+      place-sub-field3: $sensorId
+      type: camera
+    sensor-$sensorNum:
+      coordinate: 0;0;0
+      description: $sensorId
+      enable: 1
+      id: $sensorId
+      location: 0;0;0
+      type: Camera
+    source-$sensorNum:
+      cuda-memory-type: 1
+      enable: 1
+      gpu-id: 0
+      latency: 300
+      num-sources: 1
+      nvbuf-memory-type: 0
+      rtsp-reconnect-interval-sec: 120
+      select-rtp-protocol: 4
+      type: 4
+      url: $sourceURL
+

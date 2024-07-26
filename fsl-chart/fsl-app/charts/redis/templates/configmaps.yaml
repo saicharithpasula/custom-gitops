@@ -1,0 +1,13 @@
+
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: {{ $.Chart.Name }}-configs-cm
+  labels:
+{{ include "hb.labels.standard" . | indent 4 }}
+{{- include "std-helm.labels" $ | nindent 4 }}
+data:
+  redis.conf: |
+    {{- index .Values.configs "redis.conf" |  nindent 4 }}
+  config.yaml: |
+    {{- index .Values.configs "config.yaml" | toYaml | nindent 4 }}

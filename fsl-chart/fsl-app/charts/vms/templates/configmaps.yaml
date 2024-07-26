@@ -1,0 +1,17 @@
+
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: {{ $.Chart.Name }}-configs-cm
+  labels:
+{{ include "hb.labels.standard" . | indent 4 }}
+{{- include "std-helm.labels" $ | nindent 4 }}
+data:
+  rtsp_streams.json: |
+    {{- index .Values.configs "rtsp_streams.json" | toPrettyJson | nindent 4 }}
+  vst_config.json: |
+    {{- index .Values.configs "vst_config.json" | toPrettyJson | nindent 4 }}
+  config.yaml: |
+    {{- index .Values.configs "config.yaml" | toYaml | nindent 4 }}
+  adaptor_config.json: |
+    {{- index .Values.configs "adaptor_config.json" | toPrettyJson | nindent 4 }}

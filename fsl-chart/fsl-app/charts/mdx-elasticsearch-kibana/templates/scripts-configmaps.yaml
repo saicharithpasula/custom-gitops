@@ -1,0 +1,9 @@
+
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: {{ $.Chart.Name }}-scripts-cm
+data:
+  script.sh: |
+    #The scripts can be used as commands in the Initcontainers or as container commands.
+    #Size of script file can not exceed 1 MiB

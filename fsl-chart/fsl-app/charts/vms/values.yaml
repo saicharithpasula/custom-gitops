@@ -1,0 +1,342 @@
+Component:
+  app-version: 1.1.35
+  description: vms media service
+  helmUrlLocationPath: https://helm.ngc.nvidia.com/myorg/myteam/charts
+  name: vms
+  version: 1.1.35
+affinity: {}
+applicationSpecs:
+  vms:
+    apptype: stateless
+    containers:
+      vms-container:
+        args:
+        - --vstConfigFile
+        - /opt/configs/vst_config.json
+        - --adaptorConfigFile
+        - /opt/configs/adaptor_config.json
+        - --rtspStreamsFile
+        - /opt/configs/rtsp_streams.json
+        env:
+        - name: REDIS_SVC_SERVICE_HOST
+          value: $egress.redis.address
+        - name: REDIS_SVC_SERVICE_PORT
+          value: $egress.redis.port
+        image:
+          pullPolicy: IfNotPresent
+          repository: $params.image
+          tag: $params.tag
+        livenessProbe:
+          httpGet:
+            port: http
+        ports:
+        - containerPort: 30000
+          name: http
+        readinessProbe:
+          httpGet:
+            port: http
+        volumeMounts:
+        - mountPath: /opt/vmounts/vst-data
+          name: data-storage
+          subPath: vms_data
+        - mountPath: /opt/vmounts/video-data
+          name: data-storage
+          subPath: vms_video
+    initContainers:
+    - args:
+      - until ! [[ "$egress.redis.port" =~ ^[1-9] ]] || curl --connect-timeout 1 $egress.redis.address:$egress.redis.port
+        2>&1 | grep 'Empty reply from server' >/dev/null; do echo "Waiting for redis";
+        done
+      command:
+      - sh
+      - -c
+      image: curlimages/curl:7.83.1
+      imagePullPolicy: IfNotPresent
+      name: check-redis-up
+    securityContext:
+      runAsGroup: 1000
+      runAsUser: 1000
+    services:
+      svc:
+        externalTrafficPolicy: Local
+        ports:
+        - name: vms
+          nodePort: 30000
+          port: 30000
+          protocol: TCP
+        - name: rtsp
+          nodePort: 30554
+          port: 30554
+          protocol: TCP
+        - name: rtsp-in
+          nodePort: 30001
+          port: 30001
+          protocol: UDP
+          range: $params.rtspPortRange
+        - name: udp-video-in
+          nodePort: 30031
+          port: 30031
+          protocol: UDP
+        - name: udp-audio-in
+          nodePort: 30032
+          port: 30032
+          protocol: UDP
+        type: NodePort
+    volumes:
+    - name: data-storage
+      persistentVolumeClaim:
+        claimName: vms-local-storage-pvc
+defaultVolumeMounts:
+- mountPath: /opt/workload-config
+  name: workload-cm-volume
+- mountPath: /opt/configs
+  name: configs-volume
+- mountPath: /opt/scripts
+  name: scripts-cm-volume
+defaultVolumes:
+- configMap:
+    name: vms-workload-cm
+  name: workload-cm-volume
+- configMap:
+    name: vms-configs-cm
+  name: configs-volume
+- configMap:
+    name: vms-scripts-cm
+  name: scripts-cm-volume
+egress:
+  redis:
+    address: <PLACEHOLDER>
+    port: 0
+image: nvcr.io/rxczgrvsg8nx/vst-1-0/vst
+imagePullSecrets: []
+ingress:
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-body-size: '0'
+    nginx.ingress.kubernetes.io/rewrite-target: /$1
+  className: nginx
+  enabled: false
+  rules:
+  - http:
+      paths:
+      - backend:
+          service:
+            name: vms-vms-svc
+            port:
+              number: 30000
+        path: /vms/(.*)
+        pathType: Prefix
+nodeSelector: {}
+podAnnotations: {}
+podSecurityContext: {}
+replicaCount: 1
+resources: {}
+rtspPortRange: 30
+securityContext: {}
+storageClaims:
+  local-storage:
+    annotations:
+      helm.sh/resource-policy: keep
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: 100Gi
+      storageClassName: mdx-local-path
+tag: v1.1.35_x86_64
+tolerations: []
+workloadSpecs:
+  dummy: {}
+
+
+
+configs:
+  adaptor_config.json:
+    vst:
+    - control_adaptor_lib_path: prebuilts/arch/onvif_client.so
+      discovery_adaptor_lib_path: prebuilts/arch/onvif_discovery.so
+      enabled: false
+      id: 044bc643-33c5-479a-b988-10d0bbc4e05c
+      name: onvif
+      need_recording: true
+      need_rtsp_server: true
+      type: vst
+    - control_adaptor_lib_path: prebuilts/arch/onvif_client.so
+      enabled: false
+      id: 8ada39c7-5e93-43c5-ae5e-21451c8a8d1b
+      ip: 10.31.177.245
+      name: milestone_onvif_sc
+      password: 0nv!F3nG
+      port: '580'
+      type: mms
+      user: devonvif
+    - control_adaptor_lib_path: prebuilts/arch/milestone_vms.so
+      enabled: false
+      id: 9a2bb934-25c9-4ba8-b35a-4407a75afe04
+      ip: 10.31.177.245
+      name: milestone_hqengdevst01_camera_event
+      password: 0nv!F3nG
+      port: '80'
+      type: event
+      user: devonvif
+    - control_adaptor_lib_path: prebuilts/arch/milestone_vms.so
+      enabled: false
+      id: 9a2bb934-25c9-4ba8-b35a-4407a75afe04
+      ip: 10.31.177.245
+      name: milestone_hqengdevms01
+      password: 0nv!F3nG
+      port: '80'
+      type: mms
+      user: devonvif
+    - control_adaptor_lib_path: prebuilts/arch/onvif_client.so
+      enabled: false
+      id: 60cc6914-b395-48c4-9989-1f681f01de6b
+      ip: 10.24.142.224
+      name: milestone_onvif_pune
+      password: 0nv!F3nG
+      port: '580'
+      user: devonvif
+    - control_adaptor_lib_path: prebuilts/arch/nv_streamer.so
+      enabled: false
+      id: 640c3667-81e6-460f-b926-b8008a130dba
+      name: vms_streamer
+      need_recording: false
+      need_rtsp_server: true
+      type: streamer
+    - control_adaptor_lib_path: prebuilts/arch/rtsp_streams.so
+      enabled: true
+      id: 6cdec7d7-0f30-450c-a78a-756c3e132fd3
+      name: vst_rtsp
+      need_recording: true
+      need_rtsp_server: true
+      type: vst
+    - control_adaptor_lib_path: test/adaptor/control/test_control.so
+      discovery_adaptor_lib_path: test/adaptor/discovery/test_discovery.so
+      enabled: false
+      id: b42cf1ba-1ccf-4bac-979e-a4e28bd98044
+      name: test_vms
+      need_recording: true
+      need_rtsp_server: true
+      type: vst
+  config.yaml:
+    SampleConfig:
+      sampleValue: 0
+  rtsp_streams.json:
+    streams:
+    - enabled: false
+      name: Amcrest
+      stream_in: rtsp://admin:nvidia123@10.24.217.246:554/cam/realmonitor?channel=1&subtype=0&unicast=true&proto=Onvif
+    - enabled: false
+      name: Sample_input
+      stream_in: rtsp://vst-streamer-deployment-svc:8554/tokkio_sample_clip.mkv
+    - audio:
+        bits_per_sample: 32
+        codec: pcm
+        enabled: true
+        port: 30032
+        sample_rate_Hz: 44100
+      enabled: false
+      name: Tokkio_Avatar
+      stream_in: udp
+      video:
+        codec: h264
+        framerate: 30
+        port: 30031
+  vst_config.json:
+    data:
+      always_recording: false
+      enable_aging_policy: false
+      enable_rtsp_server_frameid_support: false
+      gpu_indices: []
+      max_video_download_size_MB: 1000
+      nv_streamer_directory_path: ''
+      nv_streamer_loop_playback: true
+      nv_streamer_max_upload_file_size_MB: 10000
+      nv_streamer_media_container_supported:
+      - mp4
+      - mkv
+      nv_streamer_rtsp_server_output_buffer_size_kb: 800
+      nv_streamer_seekable: false
+      recorded_video_dir_root: /opt/vmounts/video-data/
+      storage_monitoring_frequency_secs: 2
+      storage_threshold_percentage: 95
+      supported_audio_codecs:
+      - pcmu
+      - mpeg4-generic
+      supported_video_codecs:
+      - h264
+      total_video_storage_size_MB: 10000
+      use_software_path: false
+      vst_data_path: /opt/vmounts/vst-data/
+      webrtc_in_fixed_resolution: 1280x720
+      webrtc_in_max_framerate: 30
+      webrtc_in_video_bitrate_thresold_percentage: 50
+    debug:
+      enable_debug_apis: true
+      enable_gst_debug_probes: true
+      enable_highlighting_logs: false
+      enable_perf_logging: true
+      enable_prometheus: false
+      enable_qos_monitoring: true
+      prometheus_port: '8080'
+      qos_data_capture_interval_sec: 1
+      qos_data_publish_interval_sec: 5
+      qos_logfile_path: /opt/vmounts/vst-data/
+    network:
+      coturn_turnurl_list_with_secret: []
+      enable_frame_drop: false
+      enable_grpc: false
+      grpc_server_port: '50051'
+      http_port: '30000'
+      max_webrtc_in_connections: 1
+      max_webrtc_out_connections: 8
+      ntp_servers: []
+      rtsp_in_base_udp_port_num: 30001
+      rtsp_preferred_network_iface: ''
+      rtsp_server_port: 30554
+      rtsp_server_reclamation_client_timeout_sec: 10
+      rtsp_streaming_over_tcp: true
+      server_domain_name: ''
+      socket_buffer_size: 2000000
+      static_turnurl_list: []
+      stream_monitor_interval_secs: 2
+      stunurl_list:
+      - stun.l.google.com:19302
+      twilio_account_sid: ''
+      twilio_auth_token: ''
+      udp_drop_on_latency: false
+      udp_latency_ms: 200
+      use_coturn_auth_secret: false
+      use_twilio_stun_turn: false
+      webrtc_in_audio_sender_max_bitrate: 128000
+      webrtc_in_video_degradation_preference: resolution
+      webrtc_in_video_sender_max_framerate: 30
+      webrtc_latency_ms: 500
+      webrtc_max_birate: 10000
+      webrtc_min_birate: 2000
+      webrtc_start_birate: 4000
+      webservice_access_control_list: ''
+    notifications:
+      enable_notification: true
+      kafka_server_address: 0.0.0.0:9092
+      message_broker_topic: vst_events
+      redis_server_env_var: REDIS_SVC_SERVICE_HOST:9092
+      use_message_broker: redis
+    onvif:
+      bitrate_kbps: 8000
+      device_discovery_interfaces: []
+      device_discovery_timeout_secs: 10
+      framerate: 30
+      max_devices_supported: 100
+      max_gov_length: 60
+      onvif_request_timeout_secs: 10
+      resolution: 1920x1080
+    overlay:
+      use_video_metadata_protobuf: true
+      video_metadata_query_batch_size_num_frames: 300
+      video_metadata_server: 10.24.217.28:9200/mdx-raw*
+    security:
+      use_http_digest_authentication: false
+      use_https: false
+      use_rtsp_authentication: false
+

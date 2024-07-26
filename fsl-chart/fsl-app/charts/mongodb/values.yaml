@@ -1,0 +1,100 @@
+Component:
+  app-version: 0.0.3
+  description: mongodb service
+  helmUrlLocationPath: https://helm.ngc.nvidia.com/myorg/myteam/charts
+  name: mongodb
+  version: 0.0.3
+affinity: {}
+applicationSpecs:
+  mongodb:
+    apptype: stateless
+    containers:
+      mongodb-container:
+        image:
+          pullPolicy: IfNotPresent
+          repository: mongo
+          tag: 4.4.15
+        livenessProbe:
+          exec:
+            command:
+            - mongo
+            - --eval
+            - db.adminCommand('ping')
+        ports:
+        - containerPort: 27017
+          name: mongo
+          protocol: TCP
+        readinessProbe:
+          exec:
+            command:
+            - mongo
+            - --eval
+            - db.adminCommand('ping')
+        volumeMounts:
+        - mountPath: /data/db
+          name: db-storage
+          subPath: mongodb
+    restartPolicy: Always
+    securityContext:
+      runAsGroup: 1000
+      runAsUser: 1000
+    services:
+      svc:
+        ports:
+        - name: mongo
+          port: 27017
+          protocol: TCP
+        type: ClusterIP
+    volumes:
+    - name: db-storage
+      persistentVolumeClaim:
+        claimName: mongodb-local-storage-pvc
+defaultVolumeMounts:
+- mountPath: /opt/workload-config
+  name: workload-cm-volume
+- mountPath: /opt/configs
+  name: configs-volume
+- mountPath: /opt/scripts
+  name: scripts-cm-volume
+defaultVolumes:
+- configMap:
+    name: mongodb-workload-cm
+  name: workload-cm-volume
+- configMap:
+    name: mongodb-configs-cm
+  name: configs-volume
+- configMap:
+    name: mongodb-scripts-cm
+  name: scripts-cm-volume
+egress: {}
+image:
+  pullPolicy: IfNotPresent
+imagePullSecrets: []
+ingress:
+  enabled: false
+nodeSelector: {}
+podAnnotations: {}
+podSecurityContext: {}
+replicaCount: 1
+resources: {}
+securityContext: {}
+storageClaims:
+  local-storage:
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: 15Gi
+      storageClassName: mdx-local-path
+tolerations: []
+workloadSpecs:
+  dummy: {}
+
+
+
+configs:
+  config.yaml:
+    SampleConfig:
+      sampleValue: 0
+

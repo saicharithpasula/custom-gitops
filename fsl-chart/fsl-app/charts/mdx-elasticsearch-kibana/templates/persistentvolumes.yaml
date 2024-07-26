@@ -1,0 +1,42 @@
+{{- $topValues := .Values }}
+{{- $defaultStorageClass := $topValues.storageClass -}}
+{{- $defaultVolumeStorageCapacity := $topValues.storage -}}
+{{- $pvs := $topValues.defaultVolumes }}
+
+
+{{- range $pv := $pvs }}
+{{- if $pv.createPv }}
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: {{ $.Chart.Name }}-{{ $pv.name }}-pv
+  labels:
+    volume-name: {{ $.Chart.Name }}-{{ $pv.name }}-pv
+spec:
+  capacity:
+    {{- if $pv.storage }}
+    storage: {{ $pv.storage }}
+    {{- else if $defaultVolumeStorageCapacity }}
+    storage: {{ $defaultVolumeStorageCapacity }}
+    {{- end }}
+  accessModes: {{- range $pv.accessModes }}
+  - {{.}}{{- end }}
+  persistentVolumeReclaimPolicy: {{ $pv.reclaimPolicy }}
+  {{- if $pv.storageClass }}
+  storageClassName: {{ $pv.storageClass }}
+  {{- else if $defaultStorageClass }}
+  storageClassName: {{ $defaultStorageClass }}
+  {{- end }}
+  local:
+    path: {{ $pv.localPath }}
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+      - matchExpressions:
+        - key: kubernetes.io/hostname
+          operator: In
+          values:
+          - {{ $pv.selectorNodeName }}
+---
+{{- end }}
+{{- end }}

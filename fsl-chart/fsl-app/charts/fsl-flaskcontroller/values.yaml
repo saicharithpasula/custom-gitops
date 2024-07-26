@@ -1,0 +1,203 @@
+Component:
+  app-version: 0.2.18
+  description: Custom flask controller for the fsl application
+  helmUrlLocationPath: https://helm.ngc.nvidia.com/myorg/myteam/charts
+  name: fsl-flaskcontroller
+  version: 0.2.18
+affinity: {}
+applicationSpecs:
+  fsl-flaskcontroller:
+    apptype: stateless
+    containers:
+      fsl-flaskcontroller-container:
+        args:
+        - ' python3 app_noui.pyc; '
+        command:
+        - sh
+        - -c
+        env:
+        - name: LOG_FILE
+          value: /opt/logs
+        - name: LOG_LEVEL
+          value: $params.logLevel
+        - name: MESSAGE_HOST
+          value: $egress.redis.address
+        - name: MESSAGE_PORT
+          value: $egress.redis.port
+        - name: SIMSEARCH_HOST
+          value: $egress.milvus.address
+        - name: SIMSEARCH_PORT
+          value: $egress.milvus.port
+        - name: SIMSEARCH_COLL_NAME
+          value: test_collection
+        - name: DB_HOST
+          value: $egress.mongodb.address
+        - name: DB_PORT
+          value: $egress.mongodb.port
+        - name: VMS_HOST
+          value: $egress.vms.address
+        - name: VMS_PORT
+          value: $egress.vms.port
+        - name: VMS_RTSP_PORT
+          value: '30554'
+        - name: ESK_HOST
+          value: $egress.esk.address
+        - name: ESK_PORT
+          value: $egress.esk.port
+        image:
+          pullPolicy: Always
+          repository: nvcr.io/nfgnkvuikvjm/mdx-v1_0/fsl-flaskcontroller
+          tag: '1.0'
+        livenessProbe:
+          exec:
+            command:
+            - echo
+            - TODO livenessProbe
+          initialDelaySeconds: 10
+          periodSeconds: 5
+        ports:
+        - containerPort: 8080
+          name: http
+        readinessProbe:
+          exec:
+            command:
+            - echo
+            - TODO readinessProbe
+          initialDelaySeconds: 10
+          periodSeconds: 5
+        startupProbe:
+          exec:
+            command:
+            - echo
+            - TODO startupProbe
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        volumeMounts:
+        - mountPath: /opt/logs
+          name: local-storage
+          subPath: logs
+        - mountPath: /opt/inputs
+          name: local-storage
+          subPath: simsearch
+        - mountPath: /opt/feedback
+          name: local-storage
+          subPath: unseen
+    initContainers:
+    - args:
+      - until curl --connect-timeout 5 $(VMS_ENDPOINT)/api/getLiveStreamUriList; do
+        echo "Waiting for VMS"; done
+      command:
+      - sh
+      - -c
+      env:
+      - name: VMS_ENDPOINT
+        value: $egress.vms.address:$egress.vms.port
+      image: curlimages/curl:7.83.1
+      name: check-vms-up
+    - command:
+      - sh
+      - -c
+      - until nc -z ${SIMSEARCH_HOST} ${SIMSEARCH_PORT} > /dev/null; do echo 'Waiting
+        for milvus.'; sleep 2; done;
+      env:
+      - name: SIMSEARCH_HOST
+        value: $egress.milvus.address
+      - name: SIMSEARCH_PORT
+        value: $egress.milvus.port
+      image: busybox:stable
+      imagePullPolicy: IfNotPresent
+      name: check-milvus-is-up
+    securityContext:
+      runAsGroup: 1000
+      runAsUser: 1000
+    services:
+      svc:
+        ports:
+        - name: http
+          port: 8080
+          protocol: TCP
+          targetPort: 8080
+        type: ClusterIP
+    volumes:
+    - name: local-storage
+      persistentVolumeClaim:
+        claimName: fsl-flaskcontroller-local-storage-pvc
+defaultVolumeMounts:
+- mountPath: /opt/workload-config
+  name: workload-cm-volume
+- mountPath: /opt/configs
+  name: configs-volume
+- mountPath: /opt/scripts
+  name: scripts-cm-volume
+defaultVolumes:
+- configMap:
+    name: fsl-flaskcontroller-workload-cm
+  name: workload-cm-volume
+- configMap:
+    name: fsl-flaskcontroller-configs-cm
+  name: configs-volume
+- configMap:
+    name: fsl-flaskcontroller-scripts-cm
+  name: scripts-cm-volume
+egress:
+  esk:
+    address: <PLACEHOLDER>
+    port: 0
+  milvus:
+    address: <PLACEHOLDER>
+    port: 0
+  mongodb:
+    address: <PLACEHOLDER>
+    port: 0
+  redis:
+    address: <PLACEHOLDER>
+    port: 0
+  vms:
+    address: <PLACEHOLDER>
+    port: 0
+image:
+  pullPolicy: IfNotPresent
+imagePullSecrets: []
+ingress:
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-body-size: '0'
+    nginx.ingress.kubernetes.io/rewrite-target: /
+  className: nginx
+  enabled: true
+  rules:
+  - http:
+      paths:
+      - backend:
+          service:
+            name: fsl-flaskcontroller-fsl-flaskcontroller-svc
+            port:
+              number: 8080
+        path: /
+        pathType: Prefix
+logLevel: '0'
+nodeSelector: {}
+podAnnotations: {}
+podSecurityContext: {}
+replicaCount: 1
+resources: {}
+securityContext: {}
+storageClaims:
+  local-storage:
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: 10Gi
+      storageClassName: mdx-local-path
+tolerations: []
+workloadSpecs:
+  dummy: {}
+
+
+
+configs:
+  config.yaml:
+    SampleConfig:
+      sampleValue: 0
+

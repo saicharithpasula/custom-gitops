@@ -1,0 +1,27 @@
+{{- $topValues := .Values }}
+{{- if $topValues.applicationSpecs }}
+{{- range $appName, $appData := $topValues.applicationSpecs }}
+{{- range $svcName, $svcData := $appData.services }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ $.Chart.Name }}-{{ $svcName }}
+spec:
+  {{- if eq $appData.apptype "statefull" }}
+  {{- if $svcData.clusterIP }}
+  {{- if eq $svcData.clusterIP "None" }}
+  clusterIP: None
+  {{- end }}
+  {{- end }}
+  {{- end }}
+  selector:
+    app: {{ $.Chart.Name }}-{{ $appData.appname }}
+  {{- if $svcData.type }}
+  type: {{ $svcData.type }}
+  {{- end }}
+  ports:
+  {{- $svcData.ports | toYaml | nindent 2}}
+{{- end }}
+{{- end }}
+{{- end }}
