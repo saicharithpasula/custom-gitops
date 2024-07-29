@@ -10,6 +10,6 @@ spec:
   releaseName: kubernetesdeploymentdemo
   chart: 
     spec:
-      chart: ./foundational-system/fsl-chart/fsl-app
+      chart: ./fsl-chart/fsl-app
   values:
-    replicaCount: 2
+    replicaCount: 1
